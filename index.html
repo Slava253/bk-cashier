@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BK КАССА</title>
+    <title>BK КАССА • Мгновенные заказы</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,76 +14,112 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
+
         body {
             background: #2b1b0e;
             padding: 16px;
         }
+
         .terminal {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: #f8f2e6;
             border-radius: 40px;
             overflow: hidden;
             border: 3px solid #fec233;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
+
         .header {
             background: #d62323;
-            padding: 16px 28px;
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
             color: white;
             border-bottom: 4px solid #b81c1c;
         }
+
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 1.8rem;
+            gap: 15px;
+            font-size: 2rem;
             font-weight: 800;
         }
+
+        .cashier-info {
+            background: #2d2d2d;
+            padding: 10px 25px;
+            border-radius: 40px;
+            border: 2px solid #fec233;
+            font-weight: 600;
+        }
+
         .tabs {
             display: flex;
             gap: 10px;
-            padding: 15px 20px;
+            padding: 20px 30px;
         }
+
         .tab {
             background: #5c3e1f;
             color: white;
-            padding: 12px 30px;
+            padding: 15px 40px;
             border-radius: 40px;
             cursor: pointer;
             border: 2px solid #fec233;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: 0.1s;
         }
+
         .tab.active {
             background: #fec233;
             color: #2d1d0c;
         }
+
         .workspace {
             display: flex;
-            padding: 20px;
-            gap: 20px;
+            padding: 20px 30px;
+            gap: 30px;
         }
+
         .menu-panel {
             flex: 2;
             background: #fef9ef;
-            padding: 20px;
+            padding: 25px;
             border-radius: 40px;
             border: 3px dashed #d4a373;
         }
+
         .check-panel, .issue-panel {
             flex: 1;
             background: #e7dbc6;
-            padding: 20px;
+            padding: 25px;
             border-radius: 40px;
         }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2d1d0c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
+            gap: 12px;
             margin: 20px 0;
             max-height: 500px;
             overflow-y: auto;
+            padding-right: 5px;
         }
+
         .product-card {
             background: white;
             border-radius: 20px;
@@ -92,11 +128,35 @@
             border: 2px solid #d8a76b;
             cursor: pointer;
             box-shadow: 0 5px 0 #b57c42;
+            transition: 0.1s;
         }
+
         .product-card:active {
             transform: translateY(5px);
             box-shadow: none;
         }
+
+        .product-card i {
+            font-size: 2rem;
+            color: #c53a1f;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .product-price {
+            font-weight: 800;
+            color: #c1411b;
+            background: #fee3c0;
+            padding: 4px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
         .order-items {
             background: #f5ede1;
             border-radius: 20px;
@@ -105,22 +165,26 @@
             max-height: 300px;
             overflow-y: auto;
         }
+
         .order-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #cbad86;
+            font-size: 1.1rem;
         }
+
         .total {
             background: #312713;
             color: #fddc9c;
-            padding: 15px;
+            padding: 15px 20px;
             border-radius: 40px;
             font-size: 1.8rem;
             display: flex;
             justify-content: space-between;
             margin: 15px 0;
         }
+
         .btn {
             background: #fcf3e4;
             border: 3px solid #ba6b3c;
@@ -130,9 +194,19 @@
             cursor: pointer;
             text-align: center;
             margin: 5px;
+            font-size: 1.1rem;
+            transition: 0.1s;
+            box-shadow: 0 5px 0 #8f542e;
         }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
         .btn.green { background: #d49b3b; color: white; }
         .btn.red { background: #bd4b27; color: white; }
+
         .order-card {
             background: #fff2d7;
             border-radius: 20px;
@@ -140,8 +214,26 @@
             margin-bottom: 15px;
             border: 3px solid #ba6b3c;
         }
-        .status-waiting { background: #ff9800; color: white; padding: 5px 15px; border-radius: 30px; }
-        .status-ready { background: #4CAF50; color: white; padding: 5px 15px; border-radius: 30px; }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .status-waiting { background: #ff9800; color: white; }
+        .status-ready { background: #4CAF50; color: white; }
+
         .ready-btn {
             background: #4CAF50;
             color: white;
@@ -151,61 +243,112 @@
             width: 100%;
             margin-top: 10px;
             cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
         }
-        .scanner-input {
-            width: 100%;
-            padding: 12px;
-            background: #1e1e1e;
-            color: #0f0;
-            border: 2px solid #fec233;
+
+        .complete-btn {
+            background: #fec233;
+            color: #2d1d0c;
+            border: none;
+            padding: 10px;
             border-radius: 30px;
-            font-size: 1.2rem;
+            width: 100%;
             margin-top: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 60px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
+    <div id="notification" class="notification">
+        <i class="fas fa-bell"></i> Новый заказ!
+    </div>
+
     <div class="terminal">
         <div class="header">
-            <div class="logo"><i class="fas fa-crown"></i> BURGER KING</div>
-            <div><i class="fas fa-user"></i> Кассир</div>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('cash')">💰 Касса</div>
-            <div class="tab" onclick="showTab('issue')">🛒 Выдача</div>
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                <span>BURGER KING</span>
+            </div>
+            <div class="cashier-info">
+                <i class="fas fa-user-tie"></i> Кассир: Анна
+            </div>
         </div>
 
-        <!-- КАССА -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('cash')">💰 КАССА</div>
+            <div class="tab" onclick="switchTab('issue')">🛒 ВЫДАЧА</div>
+        </div>
+
+        <!-- Вкладка КАССА -->
         <div id="cashTab" class="workspace">
             <div class="menu-panel">
-                <h2>🍔 Меню</h2>
+                <div class="section-title">
+                    <i class="fas fa-fire"></i>
+                    <span>МЕНЮ</span>
+                </div>
                 <div class="products-grid" id="productsGrid"></div>
-                <input type="text" id="scanner" class="scanner-input" placeholder="📷 Отсканируйте QR клиента..." autofocus>
             </div>
+
             <div class="check-panel">
-                <h2>🧾 Чек #<span id="orderNum">1284</span></h2>
-                <div class="order-items" id="orderItems"></div>
+                <div class="section-title">
+                    <i class="fas fa-receipt"></i>
+                    <span>ТЕКУЩИЙ ЗАКАЗ #<span id="orderNumber">1284</span></span>
+                </div>
+                
+                <div class="order-items" id="orderItems">
+                    <div style="text-align:center; padding:20px; color:#666;">Корзина пуста</div>
+                </div>
+
                 <div class="total">
                     <span>ИТОГО:</span>
                     <span id="totalAmount">0 ₽</span>
                 </div>
+
                 <div style="display: flex; gap: 10px;">
-                    <div class="btn" onclick="clearOrder()">Очистить</div>
-                    <div class="btn green" onclick="payCash()">Наличные</div>
-                    <div class="btn red" onclick="payCard()">Карта</div>
+                    <div class="btn" onclick="clearOrder()">ОЧИСТИТЬ</div>
+                    <div class="btn green" onclick="payOrder('cash')">НАЛИЧНЫЕ</div>
+                    <div class="btn red" onclick="payOrder('card')">КАРТА</div>
                 </div>
             </div>
         </div>
 
-        <!-- ВЫДАЧА -->
+        <!-- Вкладка ВЫДАЧА -->
         <div id="issueTab" class="workspace" style="display: none;">
             <div class="menu-panel">
-                <h2>⏳ Готовятся</h2>
+                <div class="section-title">
+                    <i class="fas fa-clock"></i>
+                    <span>ГОТОВЯТСЯ</span>
+                </div>
                 <div class="order-items" id="waitingOrders"></div>
             </div>
+
             <div class="issue-panel">
-                <h2>✅ Готовы к выдаче</h2>
+                <div class="section-title">
+                    <i class="fas fa-check-circle"></i>
+                    <span>ГОТОВЫ К ВЫДАЧЕ</span>
+                </div>
                 <div class="order-items" id="readyOrders"></div>
             </div>
         </div>
@@ -222,25 +365,27 @@
             messagingSenderId: "385000840969",
             appId: "1:385000840969:web:1ec8d09176b6551dc0fdd8"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         // ========== ТОВАРЫ ==========
         const products = [
-            { id: 1, name: 'Воппер', price: 199 },
-            { id: 2, name: 'Чизбургер', price: 89 },
-            { id: 3, name: 'Двойной Воппер', price: 329 },
-            { id: 4, name: 'Лонг Чикен', price: 219 },
-            { id: 5, name: 'Стрипсы 3шт', price: 149 },
-            { id: 6, name: 'Наггетсы 6шт', price: 159 },
-            { id: 7, name: 'Картофель фри', price: 119 },
-            { id: 8, name: 'Кола', price: 99 },
-            { id: 9, name: 'Морс', price: 109 },
-            { id: 10, name: 'Пирожок', price: 89 }
+            { id: 1, name: 'Воппер', price: 199, icon: 'fa-burger' },
+            { id: 2, name: 'Чизбургер', price: 89, icon: 'fa-cheese' },
+            { id: 3, name: 'Двойной Воппер', price: 329, icon: 'fa-burger' },
+            { id: 4, name: 'Лонг Чикен', price: 219, icon: 'fa-drumstick-bite' },
+            { id: 5, name: 'Стрипсы 3шт', price: 149, icon: 'fa-drumstick' },
+            { id: 6, name: 'Наггетсы 6шт', price: 159, icon: 'fa-cubes' },
+            { id: 7, name: 'Картофель фри', price: 119, icon: 'fa-french-fries' },
+            { id: 8, name: 'Кола', price: 99, icon: 'fa-wine-bottle' },
+            { id: 9, name: 'Морс', price: 109, icon: 'fa-mug-hot' },
+            { id: 10, name: 'Пирожок', price: 89, icon: 'fa-cake-candles' }
         ];
 
+        // ========== ПЕРЕМЕННЫЕ ==========
         let currentOrder = [];
-        let currentOrderNumber = 1284;
+        let currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
         let orders = {};
 
         // ========== РЕНДЕР ТОВАРОВ ==========
@@ -250,7 +395,11 @@
             products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
-                card.innerHTML = `<div>${p.name}</div><div>${p.price} ₽</div>`;
+                card.innerHTML = `
+                    <i class="fas ${p.icon}"></i>
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">${p.price} ₽</div>
+                `;
                 card.onclick = () => addToOrder(p);
                 grid.appendChild(card);
             });
@@ -259,8 +408,11 @@
         // ========== ДОБАВЛЕНИЕ В ЗАКАЗ ==========
         function addToOrder(product) {
             const existing = currentOrder.find(i => i.id === product.id);
-            if (existing) existing.quantity++;
-            else currentOrder.push({ ...product, quantity: 1 });
+            if (existing) {
+                existing.quantity++;
+            } else {
+                currentOrder.push({ ...product, quantity: 1 });
+            }
             updateOrderDisplay();
         }
 
@@ -270,7 +422,7 @@
             const totalSpan = document.getElementById('totalAmount');
             
             if (currentOrder.length === 0) {
-                container.innerHTML = '<div style="padding:20px; text-align:center;">Корзина пуста</div>';
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Корзина пуста</div>';
                 totalSpan.innerText = '0 ₽';
                 return;
             }
@@ -279,7 +431,12 @@
             let total = 0;
             currentOrder.forEach(item => {
                 total += item.price * item.quantity;
-                html += `<div class="order-item"><span>${item.name} x${item.quantity}</span><span>${item.price * item.quantity} ₽</span></div>`;
+                html += `
+                    <div class="order-item">
+                        <span>${item.name} x${item.quantity}</span>
+                        <span>${item.price * item.quantity} ₽</span>
+                    </div>
+                `;
             });
             container.innerHTML = html;
             totalSpan.innerText = total + ' ₽';
@@ -292,40 +449,82 @@
         }
 
         // ========== ОПЛАТА ==========
-        function payCash() {
-            if (currentOrder.length === 0) return alert('Корзина пуста');
-            
-            const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
+        function payOrder(method) {
+            if (currentOrder.length === 0) {
+                alert('Корзина пуста');
+                return;
+            }
+
             const orderNum = currentOrderNumber;
-            
+            const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
+
             // Сохраняем в Firebase
             db.ref('orders/' + orderNum).set({
-                items: currentOrder.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+                items: currentOrder.map(i => ({
+                    name: i.name,
+                    price: i.price,
+                    quantity: i.quantity
+                })),
                 total: total,
                 status: 'waiting',
-                createdAt: Date.now()
+                createdAt: Date.now(),
+                paymentMethod: method
+            }).then(() => {
+                alert(`✅ Заказ #${orderNum} оплачен`);
+                currentOrder = [];
+                currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('orderNumber').innerText = currentOrderNumber;
+                updateOrderDisplay();
             });
-            
-            // Сохраняем локально
-            orders[orderNum] = {
-                items: [...currentOrder],
-                status: 'waiting',
-                total: total
-            };
-            
-            alert(`✅ Заказ #${orderNum} оплачен`);
-            currentOrder = [];
-            currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('orderNum').innerText = currentOrderNumber;
-            updateOrderDisplay();
-            updateIssueDisplay();
         }
 
-        function payCard() {
-            payCash(); // та же логика
+        // ========== МГНОВЕННОЕ ПОЛУЧЕНИЕ ЗАКАЗОВ ==========
+        function setupFirebaseListener() {
+            // Слушаем ВСЕ новые заказы
+            db.ref('orders').on('child_added', (snapshot) => {
+                const order = snapshot.val();
+                const orderNum = snapshot.key;
+                
+                // Добавляем в локальное хранилище
+                orders[orderNum] = {
+                    ...order,
+                    status: 'waiting'
+                };
+                
+                // Показываем уведомление
+                showNotification('Новый заказ #' + orderNum);
+                
+                // Обновляем экран выдачи
+                updateIssueDisplay();
+                
+                // Вибрируем если есть новый заказ
+                if (navigator.vibrate) navigator.vibrate(200);
+            });
+
+            // Слушаем изменения статусов
+            db.ref('orders').on('child_changed', (snapshot) => {
+                const order = snapshot.val();
+                const orderNum = snapshot.key;
+                
+                if (orders[orderNum]) {
+                    orders[orderNum].status = order.status;
+                    updateIssueDisplay();
+                }
+            });
         }
 
-        // ========== ВЫДАЧА ==========
+        // ========== ПОКАЗ УВЕДОМЛЕНИЯ ==========
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            notif.innerHTML = `<i class="fas fa-bell"></i> ${text}`;
+            notif.style.display = 'block';
+            
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+        }
+
+        // ========== ОБНОВЛЕНИЕ ЭКРАНА ВЫДАЧИ ==========
         function updateIssueDisplay() {
             const waitingDiv = document.getElementById('waitingOrders');
             const readyDiv = document.getElementById('readyOrders');
@@ -334,39 +533,45 @@
             let readyHtml = '';
             
             Object.entries(orders).forEach(([num, data]) => {
-                const items = data.items.map(i => `${i.name} x${i.quantity}`).join(', ');
+                const itemsList = data.items.map(i => `${i.name} x${i.quantity}`).join(', ');
                 
                 if (data.status === 'waiting') {
                     waitingHtml += `
                         <div class="order-card">
-                            <div style="display:flex; justify-content:space-between;">
+                            <div class="order-header">
                                 <span>#${num}</span>
-                                <span class="status-waiting">⏳ Готовится</span>
+                                <span class="status-badge status-waiting">⏳ Готовится</span>
                             </div>
-                            <div>${items}</div>
-                            <button class="ready-btn" onclick="setReady('${num}')">✅ Готово</button>
+                            <div style="margin: 10px 0;">${itemsList}</div>
+                            <div style="margin: 5px 0; color:#c53a1f;">Сумма: ${data.total} ₽</div>
+                            <button class="ready-btn" onclick="markAsReady('${num}')">
+                                ✅ ГОТОВО
+                            </button>
                         </div>
                     `;
                 } else {
                     readyHtml += `
                         <div class="order-card">
-                            <div style="display:flex; justify-content:space-between;">
+                            <div class="order-header">
                                 <span>#${num}</span>
-                                <span class="status-ready">✅ Готов</span>
+                                <span class="status-badge status-ready">✅ Готов</span>
                             </div>
-                            <div>${items}</div>
-                            <button class="ready-btn" style="background:#fec233; color:#000;" onclick="completeOrder('${num}')">🛒 Выдан</button>
+                            <div style="margin: 10px 0;">${itemsList}</div>
+                            <div style="margin: 5px 0; color:#c53a1f;">Сумма: ${data.total} ₽</div>
+                            <button class="complete-btn" onclick="completeOrder('${num}')">
+                                🛒 ВЫДАН
+                            </button>
                         </div>
                     `;
                 }
             });
             
-            waitingDiv.innerHTML = waitingHtml || '<p style="padding:20px;">Нет заказов</p>';
-            readyDiv.innerHTML = readyHtml || '<p style="padding:20px;">Нет готовых заказов</p>';
+            waitingDiv.innerHTML = waitingHtml || '<p style="text-align:center; padding:20px;">Нет заказов</p>';
+            readyDiv.innerHTML = readyHtml || '<p style="text-align:center; padding:20px;">Нет готовых заказов</p>';
         }
 
-        // ========== СТАТУСЫ ==========
-        window.setReady = (orderNum) => {
+        // ========== ОТМЕТИТЬ КАК ГОТОВО ==========
+        window.markAsReady = (orderNum) => {
             if (orders[orderNum]) {
                 orders[orderNum].status = 'ready';
                 db.ref('orders/' + orderNum).update({ status: 'ready', readyAt: Date.now() });
@@ -374,43 +579,16 @@
             }
         };
 
+        // ========== ЗАКАЗ ВЫДАН ==========
         window.completeOrder = (orderNum) => {
             delete orders[orderNum];
+            // Можно удалить из Firebase или оставить для истории
+            // db.ref('orders/' + orderNum).remove();
             updateIssueDisplay();
         };
 
-        // ========== СКАНЕР QR ==========
-        document.getElementById('scanner').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const code = e.target.value.trim();
-                // Ищем заказ в Firebase
-                db.ref('orders').once('value', (snapshot) => {
-                    const allOrders = snapshot.val();
-                    let found = null;
-                    for (let num in allOrders) {
-                        if (code.includes(num)) {
-                            found = { num, ...allOrders[num] };
-                            break;
-                        }
-                    }
-                    if (found) {
-                        if (found.status === 'ready') {
-                            alert(`✅ Заказ #${found.num} готов к выдаче`);
-                            delete orders[found.num];
-                            updateIssueDisplay();
-                        } else {
-                            alert(`❌ Заказ #${found.num} ещё готовится`);
-                        }
-                    } else {
-                        alert('❌ Заказ не найден');
-                    }
-                });
-                e.target.value = '';
-            }
-        });
-
         // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
-        window.showTab = (tab) => {
+        window.switchTab = (tab) => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             
@@ -424,19 +602,10 @@
             }
         };
 
-        // ========== СЛУШАЕМ ИЗМЕНЕНИЯ ==========
-        db.ref('orders').on('child_changed', (snapshot) => {
-            const order = snapshot.val();
-            const num = snapshot.key;
-            if (order.status === 'ready') {
-                if (orders[num]) orders[num].status = 'ready';
-                updateIssueDisplay();
-            }
-        });
-
         // ========== ЗАПУСК ==========
         renderProducts();
         updateOrderDisplay();
+        setupFirebaseListener();
     </script>
 </body>
 </html>
