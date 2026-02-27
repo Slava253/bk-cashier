@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BK КАССА • ФИНАЛ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <!-- QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #2b1b0e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .pos-terminal {
+            max-width: 1600px;
+            width: 100%;
+            background: #f8f2e6;
+            border-radius: 40px 40px 24px 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 2px #f3c682 inset;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: #d62323;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            border-bottom: 4px solid #b81c1c;
+        }
+
+        .bk-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bk-logo i {
+            font-size: 2.2rem;
+            filter: drop-shadow(2px 2px 0 #a31616);
+        }
+
+        .bk-logo span {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0 #9c1d1d;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin: 0 20px;
+        }
+        .mode-btn {
+            background: #5c3e1f;
+            border: 2px solid #fec233;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mode-btn.active {
+            background: #fec233;
+            color: #2d1d0c;
+        }
+
+        .cashier-info {
+            background: #2d2d2d;
+            padding: 8px 20px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-weight: 600;
+            border: 2px solid #fec233;
+        }
+
+        .workspace {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* Авторизация */
+        .auth-screen {
+            width: 100%;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #4a3a2a, #2d1d0c);
+        }
+
+        .auth-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 80px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+            border: 5px solid #fec233;
+            width: 450px;
+        }
+
+        .auth-card h2 {
+            color: #c53a1f;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 15px 25px;
+            font-size: 1.3rem;
+            border: 3px solid #ba6b3c;
+            border-radius: 60px;
+            margin: 15px 0;
+            text-align: center;
+            outline: none;
+        }
+
+        .auth-btn {
+            background: #d49b3b;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            border-radius: 60px;
+            cursor: pointer;
+            color: white;
+            margin: 10px 0;
+            width: 100%;
+            border: 3px solid #7e491e;
+        }
+
+        /* Кассир */
+        .cashier-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 0 20px;
+        }
+        .cashier-tab {
+            background: #5c3e1f;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid #fec233;
+        }
+        .cashier-tab.active {
+            background: #fec233;
+            color: #2d1d0c;
+        }
+
+        .cashier-mode {
+            display: flex;
+            width: 100%;
+        }
+
+        .menu-panel {
+            flex: 2;
+            min-width: 600px;
+            background: #fef9ef;
+            padding: 24px 20px 20px 20px;
+            border-right: 3px dashed #d4a373;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e0c8a6;
+            padding-bottom: 10px;
+        }
+
+        .cat-btn {
+            background: #f0dbb8;
+            border: none;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 40px 40px 12px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 2px solid transparent;
+            color: #3d2b14;
+        }
+
+        .cat-btn.active {
+            background: #c53a1f;
+            color: white;
+            border-color: #fec233;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 0 #8b2c18;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            border: 2px solid #d8a76b;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #b57c42;
+            font-size: 0.9rem;
+        }
+
+        .product-card:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #b57c42;
+        }
+
+        .product-icon {
+            font-size: 2rem;
+        }
+
+        .product-price {
+            font-weight: 800;
+            color: #c1411b;
+            background: #fee3c0;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .check-panel {
+            flex: 1.2;
+            min-width: 380px;
+            background: #e7dbc6;
+            padding: 20px 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .check-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 3px dotted #b17e55;
+            padding-bottom: 10px;
+        }
+
+        .order-num {
+            background: #2f2f2f;
+            color: #ffbe5c;
+            padding: 6px 15px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .order-items {
+            flex: 1;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f5ede1;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 15px 0;
+            border: 2px solid #ba8b5a;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #cbad86;
+        }
+
+        .item-qty {
+            background: #c1411b;
+            color: white;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px 4px 12px 4px;
+        }
+
+        .check-total {
+            background: #312713;
+            color: #fddc9c;
+            padding: 14px 20px;
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 12px 0;
+        }
+
+        .action-btn {
+            background: #fcf3e4;
+            border: 3px solid #ba6b3c;
+            padding: 14px 0;
+            border-radius: 60px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 6px 0 #8f542e;
+            flex: 1;
+        }
+
+        .action-btn:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        .green { background: #d49b3b; color: white; }
+        .red { background: #bd4b27; color: white; }
+        .blue { background: #2f6f9f; color: white; }
+
+        .scanner-input {
+            background: #1e1e1e;
+            border: 2px solid #fec233;
+            color: #0f0;
+            padding: 12px;
+            border-radius: 30px;
+            width: 100%;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* Выдача */
+        .issue-panel {
+            flex: 1.2;
+            min-width: 380px;
+            background: #e7dbc6;
+            padding: 20px 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .orders-list {
+            flex: 1;
+            max-height: 500px;
+            overflow-y: auto;
+            background: #f5ede1;
+            border-radius: 24px;
+            padding: 16px;
+            border: 2px solid #ba8b5a;
+        }
+
+        .order-card {
+            background: #fff2d7;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 3px solid #ba6b3c;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .order-status {
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .status-ready { background: #4CAF50; color: white; }
+        .status-waiting { background: #ff9800; color: white; }
+
+        .ready-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Клиент */
+        .client-mode {
+            display: flex;
+            width: 100%;
+            min-height: 550px;
+            background: #2d3e2d;
+            padding: 30px;
+            gap: 30px;
+            color: white;
+        }
+
+        .client-menu {
+            flex: 1.5;
+            background: rgba(0,0,0,0.3);
+            border-radius: 60px;
+            padding: 30px;
+        }
+
+        .client-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .client-product-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 30px;
+            padding: 10px;
+            color: #2d1d0c;
+            text-align: center;
+            cursor: pointer;
+            border: 3px solid #fec233;
+        }
+
+        .client-basket {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border-radius: 60px;
+            padding: 30px;
+        }
+
+        .basket-items {
+            background: #4a3a2a;
+            border-radius: 40px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .qr-section {
+            background: white;
+            border-radius: 40px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .qr-section.active { display: block; }
+
+        #clientQR { width: 150px; height: 150px; margin: 10px auto; }
+
+        .client-status {
+            font-size: 1.5rem;
+            padding: 10px;
+            border-radius: 30px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .notification {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 30px;
+            display: none;
+        }
+
+        .terminal-footer {
+            background: #4b2f18;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            color: #efc99a;
+        }
+    </style>
+</head>
+<body>
+    <div class="pos-terminal">
+        <div class="top-bar">
+            <div class="bk-logo">
+                <i class="fas fa-crown"></i>
+                <span>BURGER KING</span>
+            </div>
+            <div class="mode-switch">
+                <div class="mode-btn" id="modeCashier"><i class="fas fa-user-tie"></i> Кассир</div>
+                <div class="mode-btn" id="modeClient"><i class="fas fa-mobile-alt"></i> Клиент</div>
+            </div>
+            <div class="cashier-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="userDisplay">⚡ <span class="cashier-id">Вход не выполнен</span></span>
+                <i class="fas fa-clock"></i> <span id="liveClock">15:42</span>
+            </div>
+        </div>
+
+        <!-- АВТОРИЗАЦИЯ -->
+        <div id="authScreen" class="auth-screen">
+            <div class="auth-card">
+                <h2 id="authTitle">🔐 Вход</h2>
+                <input type="text" id="authInput" class="auth-input" placeholder="..." autofocus>
+                <button class="auth-btn" id="authBtn">Войти</button>
+                <div class="auth-hint" id="authHint"></div>
+            </div>
+        </div>
+
+        <!-- КАССИР -->
+        <div id="cashierMode" class="workspace" style="display: none;">
+            <div style="width:100%;">
+                <div class="cashier-tabs">
+                    <div class="cashier-tab active" id="cashierTabCash">💰 Касса</div>
+                    <div class="cashier-tab" id="cashierTabIssue">🛒 Выдача</div>
+                </div>
+            </div>
+            
+            <!-- Касса -->
+            <div id="cashierCashPanel" style="display: flex; width:100%;">
+                <div class="menu-panel">
+                    <div class="category-tabs">
+                        <button class="cat-btn active" data-category="all">ВСЁ</button>
+                        <button class="cat-btn" data-category="main">🍔 ВОППЕРЫ</button>
+                        <button class="cat-btn" data-category="chicken">🐔 ЧИКЕН</button>
+                        <button class="cat-btn" data-category="snack">🍟 СНЭКИ</button>
+                        <button class="cat-btn" data-category="drink">🥤 НАПИТКИ</button>
+                        <button class="cat-btn" data-category="dessert">🍰 ДЕСЕРТЫ</button>
+                        <button class="cat-btn" data-category="combo">📦 КОМБО</button>
+                    </div>
+                    <div class="products-grid" id="cashierProducts"></div>
+                    <input type="text" id="barcodeInput" class="scanner-input" placeholder="📷 USB-сканер QR / штрихкод..." autofocus>
+                </div>
+                <div class="check-panel">
+                    <div class="check-header">
+                        <h2>🔥 ЧЕК</h2>
+                        <div class="order-num" id="orderNumberBtn">#1284</div>
+                    </div>
+                    <div class="order-items" id="orderItems"></div>
+                    <div class="check-total">
+                        <span>ИТОГО:</span>
+                        <span id="totalAmount">0 ₽</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="action-btn" id="clearOrderBtn"><i class="fas fa-trash-alt"></i> Очистить</button>
+                        <button class="action-btn green" id="payCashBtn"><i class="fas fa-money-bill-wave"></i> Наличные</button>
+                        <button class="action-btn red" id="payCardBtn"><i class="fas fa-credit-card"></i> Карта</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Выдача -->
+            <div id="cashierIssuePanel" style="display: none; width:100%;">
+                <div class="menu-panel">
+                    <h2 style="margin-bottom:20px;">📋 Готовятся</h2>
+                    <div class="orders-list" id="waitingOrdersList"></div>
+                </div>
+                <div class="issue-panel">
+                    <h2 style="margin-bottom:20px;">✅ Готовы</h2>
+                    <div class="orders-list" id="readyOrdersList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- КЛИЕНТ -->
+        <div id="clientMode" class="workspace" style="display: none;">
+            <div class="client-mode">
+                <div class="client-menu">
+                    <h2>🍔 Меню</h2>
+                    <div class="client-products" id="clientProductsGrid"></div>
+                </div>
+                <div class="client-basket">
+                    <h2>🛒 Заказ</h2>
+                    <div class="basket-items" id="clientBasketItems"></div>
+                    <div class="client-total" id="clientBasketTotal">0 ₽</div>
+                    
+                    <button class="action-btn green" id="placeOrderBtn">
+                        <i class="fas fa-qrcode"></i> Получить QR
+                    </button>
+
+                    <div class="qr-section" id="qrSection">
+                        <h3 style="color:#000;">Ваш QR-код</h3>
+                        <div id="clientQR"></div>
+                        <p style="color:#333;">Заказ #<span id="qrOrderNumber">1284</span></p>
+                        <p style="color:#333; word-break: break-all;" id="trackLink"></p>
+                    </div>
+
+                    <div id="clientStatus" class="client-status" style="background:#ff9800; color:white;">
+                        ⏳ Ожидает приготовления
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal-footer">
+            <span><i class="fas fa-cash-register"></i> 70+ позиций</span>
+            <span><i class="fas fa-phone"></i> Telegram + Firebase</span>
+            <span><i class="fab fa-github"></i> GitHub ready</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ========== ВАШИ ДАННЫЕ ==========
+            const TELEGRAM_TOKEN = '8744944491:AAFZeVL5YYh7WKrFD--KBrg5mOIBjLkultI';
+            const ADMIN_CHAT_ID = '8744944491';
+            
+            // ========== НАСТРОЙКИ FIREBASE ==========
+            const firebaseConfig = {
+                apiKey: "AIzaSyBlZ5ZtyTXgtXxSXJAx1jOxwhTrzlHRJmo",
+                authDomain: "bk-cashier.firebaseapp.com",
+                databaseURL: "https://bk-cashier-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "bk-cashier",
+                storageBucket: "bk-cashier.firebasestorage.app",
+                messagingSenderId: "385000840969",
+                appId: "1:385000840969:web:1ec8d09176b6551dc0fdd8",
+                measurementId: "G-Y95D4T0PGV"
+            };
+
+            // Инициализация Firebase
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+
+            // ========== ТОВАРЫ ==========
+            const products = [
+                { id: 1, name: 'Воппер', price: 199, icon: 'fa-burger', category: 'main', barcode: '1001' },
+                { id: 2, name: 'Чизбургер', price: 89, icon: 'fa-cheese', category: 'main', barcode: '1002' },
+                { id: 3, name: 'Двойной Воппер', price: 329, icon: 'fa-burger', category: 'main', barcode: '1003' },
+                { id: 4, name: 'Лонг Чикен', price: 219, icon: 'fa-drumstick-bite', category: 'chicken', barcode: '2001' },
+                { id: 5, name: 'Стрипсы 3шт', price: 149, icon: 'fa-drumstick', category: 'chicken', barcode: '2002' },
+                { id: 6, name: 'Наггетсы 6шт', price: 159, icon: 'fa-cubes', category: 'chicken', barcode: '2003' },
+                { id: 7, name: 'Картофель фри', price: 119, icon: 'fa-french-fries', category: 'snack', barcode: '3001' },
+                { id: 8, name: 'Луковые кольца', price: 139, icon: 'fa-onion', category: 'snack', barcode: '3002' },
+                { id: 9, name: 'Кола', price: 99, icon: 'fa-wine-bottle', category: 'drink', barcode: '4001' },
+                { id: 10, name: 'Морс', price: 109, icon: 'fa-mug-hot', category: 'drink', barcode: '4002' },
+                { id: 11, name: 'Капучино', price: 149, icon: 'fa-coffee', category: 'drink', barcode: '4003' },
+                { id: 12, name: 'Пирожок', price: 89, icon: 'fa-cake-candles', category: 'dessert', barcode: '5001' },
+                { id: 13, name: 'Мороженое', price: 69, icon: 'fa-ice-cream', category: 'dessert', barcode: '5002' },
+                { id: 14, name: 'Комбо Воппер', price: 349, icon: 'fa-box', category: 'combo', barcode: '7001' },
+                { id: 15, name: 'Комбо Чикен', price: 299, icon: 'fa-box', category: 'combo', barcode: '7002' },
+                { id: 16, name: 'Биг Кинг', price: 279, icon: 'fa-burger', category: 'main', barcode: '1004' },
+                { id: 17, name: 'Воппер с сыром', price: 249, icon: 'fa-cheese', category: 'main', barcode: '1005' },
+                { id: 18, name: 'Стрипсы 6шт', price: 269, icon: 'fa-drumstick', category: 'chicken', barcode: '2004' },
+                { id: 19, name: 'Наггетсы 9шт', price: 219, icon: 'fa-cubes', category: 'chicken', barcode: '2005' },
+                { id: 20, name: 'Картофель фри (бол)', price: 149, icon: 'fa-french-fries', category: 'snack', barcode: '3003' },
+                { id: 21, name: 'Сырные палочки', price: 159, icon: 'fa-cheese', category: 'snack', barcode: '3004' },
+                { id: 22, name: 'Фанта', price: 99, icon: 'fa-wine-bottle', category: 'drink', barcode: '4004' },
+                { id: 23, name: 'Спрайт', price: 99, icon: 'fa-wine-bottle', category: 'drink', barcode: '4005' },
+                { id: 24, name: 'Айс-ти лимон', price: 89, icon: 'fa-mug-saucer', category: 'drink', barcode: '4006' },
+                { id: 25, name: 'Латте', price: 169, icon: 'fa-coffee', category: 'drink', barcode: '4007' }
+            ];
+
+            // ========== ПЕРЕМЕННЫЕ ==========
+            let currentUser = null;
+            let currentMode = 'auth';
+            let cashierSubMode = 'cash';
+            let order = [];
+            let clientOrder = [];
+            let currentOrderNumber = 1284;
+            let currentCategory = 'all';
+            let ordersDB = {};
+
+            // ========== АВТОРИЗАЦИЯ ==========
+            const authScreen = document.getElementById('authScreen');
+            const cashierDiv = document.getElementById('cashierMode');
+            const clientDiv = document.getElementById('clientMode');
+            const authTitle = document.getElementById('authTitle');
+            const authInput = document.getElementById('authInput');
+            const authBtn = document.getElementById('authBtn');
+            const authHint = document.getElementById('authHint');
+            const userDisplay = document.getElementById('userDisplay');
+            const modeCashier = document.getElementById('modeCashier');
+            const modeClient = document.getElementById('modeClient');
+
+            function showAuth(targetMode) {
+                currentMode = 'auth';
+                authScreen.style.display = 'flex';
+                cashierDiv.style.display = 'none';
+                clientDiv.style.display = 'none';
+                
+                if (targetMode === 'cashier') {
+                    authTitle.innerText = '👤 Вход кассира';
+                    authHint.innerText = 'Введите номер пропуска (2347)';
+                } else {
+                    authTitle.innerText = '👥 Вход клиента';
+                    authHint.innerText = 'Введите ваше имя (или "Гость")';
+                }
+                authInput.value = '';
+                authInput.focus();
+                window.targetAuth = targetMode;
+            }
+
+            authBtn.addEventListener('click', () => {
+                const value = authInput.value.trim();
+                if (!value) return;
+                
+                if (window.targetAuth === 'cashier') {
+                    if (value === '2347') {
+                        currentUser = 'Кассир';
+                        userDisplay.innerHTML = `👩‍💼 КАССИР: <span class="cashier-id">${currentUser}</span>`;
+                        currentMode = 'cashier';
+                        authScreen.style.display = 'none';
+                        cashierDiv.style.display = 'flex';
+                        clientDiv.style.display = 'none';
+                        renderCashierProducts();
+                        renderOrderList();
+                    } else {
+                        alert('Неверный номер пропуска');
+                    }
+                } else {
+                    currentUser = value;
+                    userDisplay.innerHTML = `👤 КЛИЕНТ: <span class="cashier-id">${currentUser}</span>`;
+                    currentMode = 'client';
+                    authScreen.style.display = 'none';
+                    cashierDiv.style.display = 'none';
+                    clientDiv.style.display = 'flex';
+                    renderClientProducts();
+                    updateClientBasket();
+                }
+            });
+
+            modeCashier.addEventListener('click', () => showAuth('cashier'));
+            modeClient.addEventListener('click', () => showAuth('client'));
+
+            // ========== ПЕРЕКЛЮЧЕНИЕ КАССА/ВЫДАЧА ==========
+            const cashierCashPanel = document.getElementById('cashierCashPanel');
+            const cashierIssuePanel = document.getElementById('cashierIssuePanel');
+            const cashierTabCash = document.getElementById('cashierTabCash');
+            const cashierTabIssue = document.getElementById('cashierTabIssue');
+
+            cashierTabCash.addEventListener('click', () => {
+                cashierSubMode = 'cash';
+                cashierTabCash.classList.add('active');
+                cashierTabIssue.classList.remove('active');
+                cashierCashPanel.style.display = 'flex';
+                cashierIssuePanel.style.display = 'none';
+            });
+
+            cashierTabIssue.addEventListener('click', () => {
+                cashierSubMode = 'issue';
+                cashierTabIssue.classList.add('active');
+                cashierTabCash.classList.remove('active');
+                cashierCashPanel.style.display = 'none';
+                cashierIssuePanel.style.display = 'flex';
+                renderIssueBoards();
+            });
+
+            // ========== РЕНДЕР ТОВАРОВ КАССИРА ==========
+            function renderCashierProducts() {
+                const grid = document.getElementById('cashierProducts');
+                grid.innerHTML = '';
+                const filtered = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
+                filtered.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <i class="fas ${p.icon} product-icon"></i>
+                        <span class="product-title">${p.name}</span>
+                        <span class="product-price">${p.price} ₽</span>
+                    `;
+                    card.addEventListener('click', () => addToOrder(p));
+                    grid.appendChild(card);
+                });
+            }
+
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentCategory = this.dataset.category;
+                    renderCashierProducts();
+                });
+            });
+
+            // ========== ФУНКЦИИ ЗАКАЗА ==========
+            function addToOrder(product) {
+                const existing = order.find(item => item.id === product.id);
+                if (existing) existing.quantity++;
+                else order.push({ ...product, quantity: 1 });
+                renderOrderList();
+            }
+
+            function renderOrderList() {
+                const container = document.getElementById('orderItems');
+                const totalSpan = document.getElementById('totalAmount');
+                if (!container) return;
+                
+                if (order.length === 0) {
+                    container.innerHTML = '<div style="padding:20px; text-align:center;">Корзина пуста</div>';
+                    totalSpan.innerText = '0 ₽';
+                    return;
+                }
+                
+                let html = '';
+                let total = 0;
+                order.forEach(item => {
+                    total += item.price * item.quantity;
+                    html += `
+                        <div class="order-item">
+                            <div style="display:flex; gap:10px;">
+                                <span class="item-qty">${item.quantity}</span>
+                                <span>${item.name}</span>
+                            </div>
+                            <div>${item.price * item.quantity} ₽</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                totalSpan.innerText = total + ' ₽';
+            }
+
+            function getTotalSum() {
+                return order.reduce((acc, item) => acc + item.price * item.quantity, 0);
+            }
+
+            // ========== ФУНКЦИИ FIREBASE И TELEGRAM ==========
+            function sendTelegram(chatId, message, orderNum = '') {
+                const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+                
+                let text = `🍔 <b>BURGER KING</b>\n`;
+                if (orderNum) text += `Заказ #${orderNum}\n`;
+                text += `──────────────\n${message}`;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: text,
+                        parse_mode: 'HTML'
+                    })
+                }).catch(e => console.log('Telegram error:', e));
+            }
+
+            function saveOrderToFirebase(orderNum, items, total) {
+                const orderRef = db.ref('orders/' + orderNum);
+                orderRef.set({
+                    items: items,
+                    total: total,
+                    status: 'waiting',
+                    createdAt: Date.now(),
+                    readyAt: null
+                });
+                console.log(`✅ Заказ #${orderNum} сохранён в Firebase`);
+            }
+
+            function updateOrderStatus(orderNum, status) {
+                db.ref('orders/' + orderNum).update({
+                    status: status,
+                    readyAt: status === 'ready' ? Date.now() : null
+                });
+                
+                if (status === 'ready') {
+                    sendTelegram(ADMIN_CHAT_ID, 
+                        `✅ Заказ #${orderNum} готов к выдаче!`, 
+                        orderNum
+                    );
+                }
+            }
+
+            // ========== ОПЛАТА ==========
+            document.getElementById('payCashBtn').addEventListener('click', () => {
+                if (order.length === 0) return alert('Корзина пуста');
+                
+                const orderNum = currentOrderNumber;
+                const total = getTotalSum();
+                
+                const items = order.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                }));
+                
+                // Сохраняем в Firebase
+                saveOrderToFirebase(orderNum, items, total);
+                
+                // Сохраняем локально
+                ordersDB[orderNum] = {
+                    items: [...order],
+                    status: 'waiting',
+                    total: total
+                };
+                
+                // Telegram уведомление
+                let itemsList = '';
+                order.forEach(item => {
+                    itemsList += `${item.name} x${item.quantity} = ${item.price * item.quantity}₽\n`;
+                });
+                sendTelegram(ADMIN_CHAT_ID, 
+                    `✅ <b>НОВЫЙ ЗАКАЗ</b>\n\n${itemsList}\n<b>ИТОГО: ${total}₽</b>`,
+                    orderNum
+                );
+                
+                alert(`✅ Заказ #${orderNum} оплачен`);
+                order = [];
+                renderOrderList();
+                newOrderNumber();
+                renderIssueBoards();
+            });
+
+            document.getElementById('payCardBtn').addEventListener('click', () => {
+                if (order.length === 0) return alert('Корзина пуста');
+                
+                const orderNum = currentOrderNumber;
+                const total = getTotalSum();
+                
+                const items = order.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                }));
+                
+                saveOrderToFirebase(orderNum, items, total);
+                
+                ordersDB[orderNum] = {
+                    items: [...order],
+                    status: 'waiting',
+                    total: total
+                };
+                
+                alert(`✅ Заказ #${orderNum} оплачен картой`);
+                order = [];
+                renderOrderList();
+                newOrderNumber();
+                renderIssueBoards();
+            });
+
+            // ========== ВЫДАЧА ==========
+            function renderIssueBoards() {
+                const waitingDiv = document.getElementById('waitingOrdersList');
+                const readyDiv = document.getElementById('readyOrdersList');
+                
+                let waitingHtml = '';
+                let readyHtml = '';
+                
+                Object.entries(ordersDB).forEach(([num, data]) => {
+                    const itemsList = data.items.map(i => `${i.name} x${i.quantity}`).join(', ');
+                    
+                    if (data.status === 'waiting') {
+                        waitingHtml += `
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span>#${num}</span>
+                                    <span class="order-status status-waiting">⏳ Готовится</span>
+                                </div>
+                                <div>${itemsList}</div>
+                                <button class="ready-btn" onclick="window.setOrderReady('${num}')">
+                                    <i class="fas fa-check"></i> Готово
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        readyHtml += `
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span>#${num}</span>
+                                    <span class="order-status status-ready">✅ Готов</span>
+                                </div>
+                                <div>${itemsList}</div>
+                                <button class="ready-btn" style="background:#fec233; color:#000;" onclick="window.completeOrder('${num}')">
+                                    <i class="fas fa-hand-holding-heart"></i> Выдан
+                                </button>
+                            </div>
+                        `;
+                    }
+                });
+                
+                waitingDiv.innerHTML = waitingHtml || '<p style="padding:20px;">Нет заказов</p>';
+                readyDiv.innerHTML = readyHtml || '<p style="padding:20px;">Нет готовых заказов</p>';
+            }
+
+            window.setOrderReady = (orderNum) => {
+                if (ordersDB[orderNum]) {
+                    ordersDB[orderNum].status = 'ready';
+                    updateOrderStatus(orderNum, 'ready');
+                    renderIssueBoards();
+                    
+                    if (currentMode === 'client' && 
+                        document.getElementById('qrOrderNumber').innerText === orderNum) {
+                        document.getElementById('clientStatus').innerHTML = '✅ Заказ готов! Заберите на кассе';
+                        document.getElementById('clientStatus').style.background = '#4CAF50';
+                    }
+                }
+            };
+
+            window.completeOrder = (orderNum) => {
+                delete ordersDB[orderNum];
+                renderIssueBoards();
+            };
+
+            // ========== КЛИЕНТ ==========
+            function renderClientProducts() {
+                const grid = document.getElementById('clientProductsGrid');
+                grid.innerHTML = '';
+                products.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'client-product-card';
+                    card.innerHTML = `
+                        <i class="fas ${p.icon}"></i>
+                        <div>${p.name}</div>
+                        <div style="color:#c53a1f;">${p.price} ₽</div>
+                    `;
+                    card.addEventListener('click', () => addToClientOrder(p));
+                    grid.appendChild(card);
+                });
+            }
+
+            function addToClientOrder(product) {
+                const existing = clientOrder.find(item => item.id === product.id);
+                if (existing) existing.quantity++;
+                else clientOrder.push({ ...product, quantity: 1 });
+                updateClientBasket();
+            }
+
+            window.removeFromClient = (id) => {
+                const index = clientOrder.findIndex(i => i.id === id);
+                if (index === -1) return;
+                if (clientOrder[index].quantity > 1) clientOrder[index].quantity--;
+                else clientOrder.splice(index, 1);
+                updateClientBasket();
+            };
+
+            function updateClientBasket() {
+                const basket = document.getElementById('clientBasketItems');
+                const totalSpan = document.getElementById('clientBasketTotal');
+                
+                if (clientOrder.length === 0) {
+                    basket.innerHTML = '<p>Корзина пуста</p>';
+                    totalSpan.innerText = '0 ₽';
+                    return;
+                }
+                
+                let html = '';
+                let total = 0;
+                clientOrder.forEach(item => {
+                    total += item.price * item.quantity;
+                    html += `
+                        <div style="display:flex; justify-content:space-between; margin:5px 0; background:#5c4a32; padding:8px; border-radius:15px;">
+                            <span>${item.name} x${item.quantity}</span>
+                            <span>
+                                ${item.price * item.quantity} ₽
+                                <button onclick="removeFromClient(${item.id})" style="background:#c53a1f; border:none; color:white; border-radius:50%; width:30px;">−</button>
+                            </span>
+                        </div>
+                    `;
+                });
+                basket.innerHTML = html;
+                totalSpan.innerText = total + ' ₽';
+            }
+
+            document.getElementById('placeOrderBtn').addEventListener('click', () => {
+                if (clientOrder.length === 0) return alert('Добавьте блюда');
+                
+                const qrSection = document.getElementById('qrSection');
+                qrSection.classList.add('active');
+                
+                const orderNum = Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('qrOrderNumber').innerText = orderNum;
+                
+                // Сохраняем в локальную базу
+                ordersDB[orderNum] = {
+                    items: [...clientOrder],
+                    status: 'waiting',
+                    total: clientOrder.reduce((acc, i) => acc + i.price * i.quantity, 0)
+                };
+                
+                // Сохраняем в Firebase
+                const items = clientOrder.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                }));
+                saveOrderToFirebase(orderNum, items, ordersDB[orderNum].total);
+                
+                // Создаём QR-код со ссылкой на отслеживание
+                const trackUrl = `https://ваш-логин.github.io/bk-tracker/track.html?order=${orderNum}`;
+                document.getElementById('trackLink').innerHTML = `🔗 <a href="${trackUrl}" target="_blank" style="color:#0066cc;">Отслеживать заказ</a>`;
+                
+                QRCode.toCanvas(trackUrl, { width: 150 }, (err, canvas) => {
+                    if (err) return;
+                    document.getElementById('clientQR').innerHTML = '';
+                    document.getElementById('clientQR').appendChild(canvas);
+                });
+                
+                document.getElementById('clientStatus').innerHTML = '⏳ Заказ передан на кухню';
+                document.getElementById('clientStatus').style.background = '#ff9800';
+                
+                renderIssueBoards();
+            });
+
+            // ========== СКАНЕР ==========
+            document.getElementById('barcodeInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const code = e.target.value.trim();
+                    if (code.startsWith('https://')) {
+                        try {
+                            const url = new URL(code);
+                            const orderNum = url.searchParams.get('order');
+                            if (orderNum && ordersDB[orderNum] && ordersDB[orderNum].status === 'ready') {
+                                alert(`✅ Заказ #${orderNum} готов к выдаче`);
+                                delete ordersDB[orderNum];
+                                renderIssueBoards();
+                            } else {
+                                alert(`❌ Заказ #${orderNum} не найден или ещё не готов`);
+                            }
+                        } catch (err) {
+                            alert('Неверный QR-код');
+                        }
+                    } else {
+                        const product = products.find(p => p.barcode === code);
+                        if (product) addToOrder(product);
+                    }
+                    e.target.value = '';
+                }
+            });
+
+            // ========== СЛУЖЕБНОЕ ==========
+            function newOrderNumber() {
+                currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
+                document.querySelectorAll('.order-num').forEach(el => el.innerText = '#' + currentOrderNumber);
+            }
+
+            document.getElementById('clearOrderBtn').addEventListener('click', () => { order = []; renderOrderList(); });
+            document.getElementById('orderNumberBtn').addEventListener('click', newOrderNumber);
+
+            // ========== ЧАСЫ ==========
+            function updateClock() {
+                const now = new Date();
+                document.getElementById('liveClock').innerText = 
+                    now.getHours().toString().padStart(2,'0') + ':' + 
+                    now.getMinutes().toString().padStart(2,'0');
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // Инициализация
+            showAuth('cashier');
+        })();
+    </script>
+</body>
+</html>
