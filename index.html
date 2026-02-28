@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        /* Стили КАССЫ - без изменений, как в предыдущей версии */
         * {
             margin: 0;
             padding: 0;
@@ -522,6 +521,71 @@
             display: inline-block;
             margin-left: 5px;
         }
+
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2500;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-content {
+            background: white;
+            padding: 40px;
+            border-radius: 60px;
+            max-width: 450px;
+            width: 90%;
+            border: 5px solid #fec233;
+            text-align: center;
+        }
+
+        .payment-content h2 {
+            color: #c53a1f;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .payment-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #2d1d0c;
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff2d7;
+            border-radius: 40px;
+        }
+
+        .payment-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .payment-btn {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .payment-btn.yes {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .payment-btn.no {
+            background: #c53a1f;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -534,23 +598,33 @@
         </div>
     </div>
 
-    <!-- Модальное окно для ввода телефона -->
+    <!-- Модальное окно для ввода телефона (обычный заказ) -->
     <div id="phoneModal" class="phone-modal">
         <div class="modal-content">
-            <h3>👑 Товары за 1 рубль</h3>
-            <p style="text-align: center; margin-bottom: 10px;">Введите номер телефона клиента один раз</p>
+            <h3>📱 Введите номер телефона</h3>
+            <p style="text-align: center; margin-bottom: 10px;">Для привязки заказа к аккаунту</p>
             <div class="phone-input" style="display: flex; align-items: center; border: 3px solid #ba6b3c; border-radius: 60px; margin: 15px 0;">
                 <span class="phone-prefix" style="padding: 15px; background: #d49b3b; border-radius: 60px 0 0 60px; font-weight: 700; color: white;">+7</span>
                 <input type="tel" id="modalPhoneInput" class="modal-input" placeholder="(999) 999-99-99" maxlength="10" style="border: none; margin: 0;">
             </div>
-            <div id="clientInfoModal" class="client-info" style="display: none;">
-                <i class="fas fa-user"></i>
-                <span id="clientNameModal"></span>
-                <span class="client-badge" id="clientCrownsModal">0 👑</span>
-            </div>
             <div class="modal-buttons">
                 <button class="modal-btn cancel" onclick="closePhoneModal()">Отмена</button>
                 <button class="modal-btn confirm" onclick="confirmPhoneForOrder()">Подтвердить</button>
+            </div>
+            <button class="auth-btn" style="margin-top: 10px; background: #4CAF50;" onclick="skipPhone()">Нет аккаунта (заказ без телефона)</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения оплаты -->
+    <div id="paymentModal" class="payment-modal">
+        <div class="payment-content">
+            <h2>💳 Подтверждение оплаты</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 10px;">Сумма к оплате:</p>
+            <div class="payment-amount" id="paymentAmount">0 ₽</div>
+            <p style="margin-bottom: 20px;">Оплата произошла успешно?</p>
+            <div class="payment-buttons">
+                <button class="payment-btn yes" onclick="confirmPayment(true)">✅ ДА</button>
+                <button class="payment-btn no" onclick="confirmPayment(false)">❌ НЕТ</button>
             </div>
         </div>
     </div>
@@ -620,8 +694,8 @@
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <div class="btn" onclick="clearOrder()">ОЧИСТИТЬ</div>
-                    <div class="btn green" onclick="payOrder('cash')">НАЛИЧНЫЕ</div>
-                    <div class="btn red" onclick="payOrder('card')">КАРТА</div>
+                    <div class="btn green" onclick="showPaymentModal('cash')">НАЛИЧНЫЕ</div>
+                    <div class="btn red" onclick="showPaymentModal('card')">КАРТА</div>
                 </div>
             </div>
         </div>
@@ -661,7 +735,7 @@
 
         // ========== ВСЕ ТОВАРЫ (90+ ПОЗИЦИЙ) ==========
         const products = [
-            // Обычные товары (не за 1 рубль)
+            // Бургеры (15)
             { id: 1, name: 'Воппер', price: 199, category: 'burger' },
             { id: 2, name: 'Чизбургер', price: 89, category: 'burger' },
             { id: 3, name: 'Двойной Воппер', price: 329, category: 'burger' },
@@ -677,6 +751,8 @@
             { id: 13, name: 'Гриль Воппер', price: 289, category: 'burger' },
             { id: 14, name: 'Чикен Бургер', price: 129, category: 'burger' },
             { id: 15, name: 'Фиш Бургер', price: 169, category: 'burger' },
+
+            // Чикен (12)
             { id: 16, name: 'Лонг Чикен', price: 219, category: 'chicken' },
             { id: 17, name: 'Лонг Чикен BBQ', price: 239, category: 'chicken' },
             { id: 18, name: 'Лонг Чикен Ранч', price: 239, category: 'chicken' },
@@ -689,6 +765,8 @@
             { id: 25, name: 'Крылья 6шт', price: 239, category: 'chicken' },
             { id: 26, name: 'Крылья 9шт', price: 329, category: 'chicken' },
             { id: 27, name: 'Крылья 15шт', price: 499, category: 'chicken' },
+
+            // Снэки (12)
             { id: 28, name: 'Картофель фри мал', price: 89, category: 'snack' },
             { id: 29, name: 'Картофель фри ср', price: 119, category: 'snack' },
             { id: 30, name: 'Картофель фри бол', price: 149, category: 'snack' },
@@ -701,6 +779,8 @@
             { id: 37, name: 'Моцарелла', price: 179, category: 'snack' },
             { id: 38, name: 'Чипсы', price: 79, category: 'snack' },
             { id: 39, name: 'Кесадилья', price: 199, category: 'snack' },
+
+            // Напитки (15)
             { id: 40, name: 'Кола 0.3л', price: 79, category: 'drink' },
             { id: 41, name: 'Кола 0.5л', price: 119, category: 'drink' },
             { id: 42, name: 'Кола 1л', price: 179, category: 'drink' },
@@ -716,6 +796,8 @@
             { id: 52, name: 'Кофе латте', price: 149, category: 'drink' },
             { id: 53, name: 'Капучино', price: 149, category: 'drink' },
             { id: 54, name: 'Горячий шоколад', price: 129, category: 'drink' },
+
+            // Десерты (10)
             { id: 55, name: 'Пирожок вишня', price: 89, category: 'dessert' },
             { id: 56, name: 'Пирожок яблоко', price: 89, category: 'dessert' },
             { id: 57, name: 'Мороженое', price: 69, category: 'dessert' },
@@ -726,6 +808,8 @@
             { id: 62, name: 'Пончик', price: 79, category: 'dessert' },
             { id: 63, name: 'Эклер', price: 99, category: 'dessert' },
             { id: 64, name: 'Тирамису', price: 229, category: 'dessert' },
+
+            // Комбо (8)
             { id: 65, name: 'Комбо Воппер', price: 349, category: 'combo' },
             { id: 66, name: 'Комбо Чикен', price: 329, category: 'combo' },
             { id: 67, name: 'Комбо Стрипсы', price: 299, category: 'combo' },
@@ -735,7 +819,7 @@
             { id: 71, name: 'Комбо Бизнес', price: 399, category: 'combo' },
             { id: 72, name: 'Комбо Пикник', price: 599, category: 'combo' },
             
-            // Товары за 1 рубль (отдельная категория)
+            // Товары за 1 рубль (12 позиций)
             { id: 101, name: 'Воппер (1₽)', price: 1, category: 'crown', crownCost: 10 },
             { id: 102, name: 'Чизбургер (1₽)', price: 1, category: 'crown', crownCost: 4 },
             { id: 103, name: 'Двойной Воппер (1₽)', price: 1, category: 'crown', crownCost: 16 },
@@ -757,6 +841,8 @@
         let totalCrowns = 0;
         let deliveryCount = 0;
         let autoOrdersInterval;
+        let currentPaymentMethod = null;
+        let pendingOrderData = null;
         
         // Данные текущего клиента для заказа
         let currentClient = {
@@ -950,6 +1036,16 @@
             pendingCrownProduct = null;
         };
 
+        window.skipPhone = () => {
+            // Добавляем товар без привязки к аккаунту
+            if (pendingCrownProduct) {
+                addToOrder(pendingCrownProduct);
+                showNotification(`✅ Товар добавлен без аккаунта`);
+                pendingCrownProduct = null;
+            }
+            document.getElementById('phoneModal').style.display = 'none';
+        };
+
         window.confirmPhoneForOrder = () => {
             const phone = document.getElementById('modalPhoneInput').value.trim();
             if (!phone || phone.length < 10) {
@@ -1114,73 +1210,96 @@
             updateOrderDisplay();
         }
 
-        function payOrder(method) {
-            if (currentOrder.length === 0) return alert('Корзина пуста');
-
-            const orderNum = currentOrderNumber;
-            const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
-            const crownEarned = Math.floor(total / 100);
-            
-            // Проверяем, есть ли товары за 1 рубль и выбран ли клиент
-            const hasCrownItems = currentOrder.some(item => item.category === 'crown');
-            
-            if (hasCrownItems && !currentClient.phone) {
-                alert('❌ Для товаров за 1 рубль необходимо ввести номер телефона клиента');
+        // Показать модальное окно оплаты
+        window.showPaymentModal = (method) => {
+            if (currentOrder.length === 0) {
+                alert('Корзина пуста');
                 return;
             }
 
-            const orderData = {
-                items: currentOrder,
-                subtotal: total,
-                delivery: 0,
-                total: total,
-                crownsEarned: crownEarned,
-                orderType: 'restaurant',
-                status: 'waiting',
-                createdAt: Date.now(),
-                paymentMethod: method,
-                isCashierOrder: true
-            };
+            const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
+            document.getElementById('paymentAmount').innerText = total + ' ₽';
+            currentPaymentMethod = method;
+            document.getElementById('paymentModal').style.display = 'flex';
+        };
 
-            // Если есть клиент, добавляем информацию о нём
-            if (currentClient.phone) {
-                orderData.clientPhone = currentClient.phone;
-                orderData.userName = currentClient.name;
-                orderData.userId = currentClient.userId;
+        // Подтверждение оплаты
+        window.confirmPayment = (success) => {
+            document.getElementById('paymentModal').style.display = 'none';
+            
+            if (success) {
+                // Успешная оплата
+                const orderNum = currentOrderNumber;
+                const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
+                const crownEarned = Math.floor(total / 100);
                 
-                // Списываем короны за товары за 1 рубль
-                const totalCrownsSpent = currentOrder
-                    .filter(item => item.category === 'crown')
-                    .reduce((acc, item) => acc + (item.crownCost || 0) * item.quantity, 0);
+                // Проверяем, есть ли товары за 1 рубль и выбран ли клиент
+                const hasCrownItems = currentOrder.some(item => item.category === 'crown');
                 
-                if (totalCrownsSpent > 0) {
-                    const newCrowns = currentClient.crowns - totalCrownsSpent;
-                    db.ref('users/' + currentClient.userId + '/crowns').set(newCrowns);
-                    orderData.crownsSpent = totalCrownsSpent;
+                if (hasCrownItems && !currentClient.phone) {
+                    alert('❌ Для товаров за 1 рубль необходимо ввести номер телефона клиента');
+                    return;
                 }
 
-                // Сохраняем заказ с userId
-                db.ref('orders/' + orderNum).set(orderData).then(() => {
-                    alert(`✅ Заказ #${orderNum} оплачен для клиента ${currentClient.name}`);
-                    showNotification(`📱 Заказ появится в истории клиента`);
+                const orderData = {
+                    items: currentOrder,
+                    subtotal: total,
+                    delivery: 0,
+                    total: total,
+                    crownsEarned: crownEarned,
+                    orderType: 'restaurant',
+                    status: 'waiting', // Статус сразу "Готовится"
+                    createdAt: Date.now(),
+                    paymentMethod: currentPaymentMethod,
+                    isCashierOrder: true
+                };
+
+                // Если есть клиент, добавляем информацию о нём
+                if (currentClient.phone) {
+                    orderData.clientPhone = currentClient.phone;
+                    orderData.userName = currentClient.name;
+                    orderData.userId = currentClient.userId;
                     
-                    currentOrder = [];
-                    clearClient();
-                    currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
-                    document.getElementById('orderNumber').innerText = currentOrderNumber;
-                    updateOrderDisplay();
-                });
+                    // Списываем короны за товары за 1 рубль
+                    const totalCrownsSpent = currentOrder
+                        .filter(item => item.category === 'crown')
+                        .reduce((acc, item) => acc + (item.crownCost || 0) * item.quantity, 0);
+                    
+                    if (totalCrownsSpent > 0) {
+                        const newCrowns = currentClient.crowns - totalCrownsSpent;
+                        db.ref('users/' + currentClient.userId + '/crowns').set(newCrowns);
+                        orderData.crownsSpent = totalCrownsSpent;
+                    }
+
+                    // Сохраняем заказ с userId
+                    db.ref('orders/' + orderNum).set(orderData).then(() => {
+                        alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН`);
+                        showNotification(`📱 Заказ появится в истории клиента`);
+                        
+                        currentOrder = [];
+                        clearClient();
+                        currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
+                        document.getElementById('orderNumber').innerText = currentOrderNumber;
+                        updateOrderDisplay();
+                    });
+                } else {
+                    // Обычный заказ без клиента
+                    db.ref('orders/' + orderNum).set(orderData).then(() => {
+                        alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН`);
+                        currentOrder = [];
+                        currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
+                        document.getElementById('orderNumber').innerText = currentOrderNumber;
+                        updateOrderDisplay();
+                    });
+                }
             } else {
-                // Обычный заказ без клиента
-                db.ref('orders/' + orderNum).set(orderData).then(() => {
-                    alert(`✅ Заказ #${orderNum} оплачен`);
-                    currentOrder = [];
-                    currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
-                    document.getElementById('orderNumber').innerText = currentOrderNumber;
-                    updateOrderDisplay();
-                });
+                // Отказ от оплаты
+                alert('❌ ОТКАЗ ОТ ОПЛАТЫ');
+                // Возвращаемся к заказу без изменений
             }
-        }
+            
+            currentPaymentMethod = null;
+        };
 
         function setupFirebaseListener() {
             db.ref('orders').on('child_added', (snapshot) => {
