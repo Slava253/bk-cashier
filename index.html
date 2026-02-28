@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
+        /* Стили КАССЫ - без изменений, как в предыдущей версии */
         * {
             margin: 0;
             padding: 0;
@@ -660,7 +661,7 @@
 
         // ========== ВСЕ ТОВАРЫ (90+ ПОЗИЦИЙ) ==========
         const products = [
-            // Бургеры (15)
+            // Обычные товары (не за 1 рубль)
             { id: 1, name: 'Воппер', price: 199, category: 'burger' },
             { id: 2, name: 'Чизбургер', price: 89, category: 'burger' },
             { id: 3, name: 'Двойной Воппер', price: 329, category: 'burger' },
@@ -676,8 +677,6 @@
             { id: 13, name: 'Гриль Воппер', price: 289, category: 'burger' },
             { id: 14, name: 'Чикен Бургер', price: 129, category: 'burger' },
             { id: 15, name: 'Фиш Бургер', price: 169, category: 'burger' },
-
-            // Чикен (12)
             { id: 16, name: 'Лонг Чикен', price: 219, category: 'chicken' },
             { id: 17, name: 'Лонг Чикен BBQ', price: 239, category: 'chicken' },
             { id: 18, name: 'Лонг Чикен Ранч', price: 239, category: 'chicken' },
@@ -690,8 +689,6 @@
             { id: 25, name: 'Крылья 6шт', price: 239, category: 'chicken' },
             { id: 26, name: 'Крылья 9шт', price: 329, category: 'chicken' },
             { id: 27, name: 'Крылья 15шт', price: 499, category: 'chicken' },
-
-            // Снэки (12)
             { id: 28, name: 'Картофель фри мал', price: 89, category: 'snack' },
             { id: 29, name: 'Картофель фри ср', price: 119, category: 'snack' },
             { id: 30, name: 'Картофель фри бол', price: 149, category: 'snack' },
@@ -704,8 +701,6 @@
             { id: 37, name: 'Моцарелла', price: 179, category: 'snack' },
             { id: 38, name: 'Чипсы', price: 79, category: 'snack' },
             { id: 39, name: 'Кесадилья', price: 199, category: 'snack' },
-
-            // Напитки (15)
             { id: 40, name: 'Кола 0.3л', price: 79, category: 'drink' },
             { id: 41, name: 'Кола 0.5л', price: 119, category: 'drink' },
             { id: 42, name: 'Кола 1л', price: 179, category: 'drink' },
@@ -721,8 +716,6 @@
             { id: 52, name: 'Кофе латте', price: 149, category: 'drink' },
             { id: 53, name: 'Капучино', price: 149, category: 'drink' },
             { id: 54, name: 'Горячий шоколад', price: 129, category: 'drink' },
-
-            // Десерты (10)
             { id: 55, name: 'Пирожок вишня', price: 89, category: 'dessert' },
             { id: 56, name: 'Пирожок яблоко', price: 89, category: 'dessert' },
             { id: 57, name: 'Мороженое', price: 69, category: 'dessert' },
@@ -733,8 +726,6 @@
             { id: 62, name: 'Пончик', price: 79, category: 'dessert' },
             { id: 63, name: 'Эклер', price: 99, category: 'dessert' },
             { id: 64, name: 'Тирамису', price: 229, category: 'dessert' },
-
-            // Комбо (8)
             { id: 65, name: 'Комбо Воппер', price: 349, category: 'combo' },
             { id: 66, name: 'Комбо Чикен', price: 329, category: 'combo' },
             { id: 67, name: 'Комбо Стрипсы', price: 299, category: 'combo' },
@@ -744,7 +735,7 @@
             { id: 71, name: 'Комбо Бизнес', price: 399, category: 'combo' },
             { id: 72, name: 'Комбо Пикник', price: 599, category: 'combo' },
             
-            // Товары за 1 рубль (12 позиций)
+            // Товары за 1 рубль (отдельная категория)
             { id: 101, name: 'Воппер (1₽)', price: 1, category: 'crown', crownCost: 10 },
             { id: 102, name: 'Чизбургер (1₽)', price: 1, category: 'crown', crownCost: 4 },
             { id: 103, name: 'Двойной Воппер (1₽)', price: 1, category: 'crown', crownCost: 16 },
