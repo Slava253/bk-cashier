@@ -432,6 +432,85 @@
             font-size: 0.7rem;
             margin-left: 5px;
         }
+
+        .phone-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 60px;
+            max-width: 400px;
+            width: 90%;
+            border: 5px solid #fec233;
+        }
+
+        .modal-content h3 {
+            color: #c53a1f;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 3px solid #ba6b3c;
+            border-radius: 60px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .modal-btn.confirm {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: #c53a1f;
+            color: white;
+        }
+
+        .client-info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 30px;
+            margin: 10px 0;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .client-info i {
+            color: #2196F3;
+        }
     </style>
 </head>
 <body>
@@ -441,6 +520,26 @@
             <input type="password" id="passwordInput" class="auth-input" placeholder="Пароль" autofocus>
             <button class="auth-btn" onclick="checkPassword()">Войти</button>
             <p style="margin-top: 20px; color: #666;">Пароль: 2347</p>
+        </div>
+    </div>
+
+    <!-- Модальное окно для ввода телефона -->
+    <div id="phoneModal" class="phone-modal">
+        <div class="modal-content">
+            <h3>👑 Товар за 1 рубль</h3>
+            <p style="text-align: center; margin-bottom: 10px;">Введите номер телефона клиента</p>
+            <div class="phone-input" style="display: flex; align-items: center; border: 3px solid #ba6b3c; border-radius: 60px; margin: 15px 0;">
+                <span class="phone-prefix" style="padding: 15px; background: #d49b3b; border-radius: 60px 0 0 60px; font-weight: 700; color: white;">+7</span>
+                <input type="tel" id="modalPhoneInput" class="modal-input" placeholder="(999) 999-99-99" maxlength="10" style="border: none; margin: 0;">
+            </div>
+            <div id="clientCrownsInfo" class="client-info" style="display: none;">
+                <i class="fas fa-crown"></i>
+                <span id="clientCrownsCount">0</span> корон доступно
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closePhoneModal()">Отмена</button>
+                <button class="modal-btn confirm" onclick="confirmPhoneForCrown()">Подтвердить</button>
+            </div>
         </div>
     </div>
 
@@ -540,7 +639,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ========== ВСЕ ТОВАРЫ (80+ ПОЗИЦИЙ) ==========
+        // ========== ВСЕ ТОВАРЫ (90+ ПОЗИЦИЙ) ==========
         const products = [
             // Бургеры (15)
             { id: 1, name: 'Воппер', price: 199, category: 'burger' },
@@ -626,15 +725,19 @@
             { id: 71, name: 'Комбо Бизнес', price: 399, category: 'combo' },
             { id: 72, name: 'Комбо Пикник', price: 599, category: 'combo' },
             
-            // Товары за 1 рубль (8)
+            // Товары за 1 рубль (12 позиций - дублируем популярные)
             { id: 101, name: 'Воппер (1₽)', price: 1, category: 'crown', crownCost: 10 },
             { id: 102, name: 'Чизбургер (1₽)', price: 1, category: 'crown', crownCost: 4 },
-            { id: 103, name: 'Картофель фри (1₽)', price: 1, category: 'crown', crownCost: 6 },
-            { id: 104, name: 'Кола (1₽)', price: 1, category: 'crown', crownCost: 5 },
-            { id: 105, name: 'Пирожок (1₽)', price: 1, category: 'crown', crownCost: 4 },
-            { id: 106, name: 'Наггетсы 3шт (1₽)', price: 1, category: 'crown', crownCost: 8 },
-            { id: 107, name: 'Мороженое (1₽)', price: 1, category: 'crown', crownCost: 3 },
-            { id: 108, name: 'Стрипсы 3шт (1₽)', price: 1, category: 'crown', crownCost: 7 }
+            { id: 103, name: 'Двойной Воппер (1₽)', price: 1, category: 'crown', crownCost: 16 },
+            { id: 104, name: 'Картофель фри (1₽)', price: 1, category: 'crown', crownCost: 6 },
+            { id: 105, name: 'Кола (1₽)', price: 1, category: 'crown', crownCost: 5 },
+            { id: 106, name: 'Пирожок (1₽)', price: 1, category: 'crown', crownCost: 4 },
+            { id: 107, name: 'Наггетсы 6шт (1₽)', price: 1, category: 'crown', crownCost: 8 },
+            { id: 108, name: 'Мороженое (1₽)', price: 1, category: 'crown', crownCost: 3 },
+            { id: 109, name: 'Стрипсы 3шт (1₽)', price: 1, category: 'crown', crownCost: 7 },
+            { id: 110, name: 'Лонг Чикен (1₽)', price: 1, category: 'crown', crownCost: 11 },
+            { id: 111, name: 'Морс (1₽)', price: 1, category: 'crown', crownCost: 5 },
+            { id: 112, name: 'Чикен Бургер (1₽)', price: 1, category: 'crown', crownCost: 6 }
         ];
 
         let currentOrder = [];
@@ -644,6 +747,7 @@
         let totalCrowns = 0;
         let deliveryCount = 0;
         let autoOrdersInterval;
+        let pendingCrownProduct = null; // Для временного хранения товара за 1р
 
         window.checkPassword = () => {
             const password = document.getElementById('passwordInput').value;
@@ -790,10 +894,83 @@
                     <div class="product-name">${p.name}</div>
                     ${priceHtml}
                 `;
-                card.onclick = () => addToOrder(p);
+                
+                if (p.category === 'crown') {
+                    card.onclick = () => handleCrownProductClick(p);
+                } else {
+                    card.onclick = () => addToOrder(p);
+                }
+                
                 grid.appendChild(card);
             });
         }
+
+        // Обработка клика на товар за 1 рубль
+        function handleCrownProductClick(product) {
+            pendingCrownProduct = product;
+            document.getElementById('phoneModal').style.display = 'flex';
+            document.getElementById('modalPhoneInput').value = '';
+            document.getElementById('clientCrownsInfo').style.display = 'none';
+        }
+
+        window.closePhoneModal = () => {
+            document.getElementById('phoneModal').style.display = 'none';
+            pendingCrownProduct = null;
+        };
+
+        window.confirmPhoneForCrown = () => {
+            const phone = document.getElementById('modalPhoneInput').value.trim();
+            if (!phone || phone.length < 10) {
+                alert('Введите номер телефона полностью');
+                return;
+            }
+
+            const fullPhone = '+7' + phone;
+            
+            // Ищем пользователя по телефону
+            db.ref('users').orderByChild('phone').equalTo(fullPhone).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    let userData = null;
+                    snapshot.forEach((child) => {
+                        userData = child.val();
+                        userData.id = child.key;
+                    });
+
+                    if (userData) {
+                        const userCrowns = userData.crowns || 0;
+                        const crownCost = pendingCrownProduct.crownCost || 0;
+                        
+                        if (userCrowns >= crownCost) {
+                            // Списываем короны
+                            const newCrowns = userCrowns - crownCost;
+                            db.ref('users/' + userData.id + '/crowns').set(newCrowns);
+                            
+                            // Добавляем товар с пометкой, что использованы короны
+                            addToOrder({
+                                ...pendingCrownProduct,
+                                usedCrowns: true,
+                                clientPhone: fullPhone,
+                                clientName: userData.name || 'Клиент'
+                            });
+                            
+                            showNotification(`✅ Товар за 1₽ для ${userData.name || 'клиента'}`);
+                            closePhoneModal();
+                        } else {
+                            alert(`❌ У клиента недостаточно корон. Доступно: ${userCrowns}, нужно: ${crownCost}`);
+                        }
+                    }
+                } else {
+                    if (confirm('Клиент не найден. Добавить товар за полную стоимость?')) {
+                        addToOrder({
+                            ...pendingCrownProduct,
+                            price: pendingCrownProduct.originalPrice || 199,
+                            usedCrowns: false
+                        });
+                        closePhoneModal();
+                    }
+                }
+            });
+        };
 
         function addToOrder(product) {
             const existing = currentOrder.find(i => i.id === product.id);
@@ -838,13 +1015,17 @@
             currentOrder.forEach(item => {
                 total += item.price * item.quantity;
                 const crownText = item.crownCost ? `<span class="crown-icon"><i class="fas fa-crown"></i> ${item.crownCost * item.quantity}</span>` : '';
+                const clientInfo = item.clientName ? `<div style="font-size:0.8rem; color:#2196F3;">📱 ${item.clientName}</div>` : '';
                 
                 html += `
                     <div class="order-item">
-                        <span>
-                            ${item.name} x${item.quantity}
-                            ${crownText}
-                        </span>
+                        <div>
+                            <span>
+                                ${item.name} x${item.quantity}
+                                ${crownText}
+                            </span>
+                            ${clientInfo}
+                        </div>
                         <div class="item-controls">
                             <span>${item.price * item.quantity} ₽</span>
                             <button class="item-btn minus" onclick="removeOneFromOrder(${item.id})">−</button>
