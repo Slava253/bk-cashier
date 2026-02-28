@@ -511,6 +511,16 @@
         .client-info i {
             color: #2196F3;
         }
+
+        .client-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -526,19 +536,20 @@
     <!-- Модальное окно для ввода телефона -->
     <div id="phoneModal" class="phone-modal">
         <div class="modal-content">
-            <h3>👑 Товар за 1 рубль</h3>
-            <p style="text-align: center; margin-bottom: 10px;">Введите номер телефона клиента</p>
+            <h3>👑 Товары за 1 рубль</h3>
+            <p style="text-align: center; margin-bottom: 10px;">Введите номер телефона клиента один раз</p>
             <div class="phone-input" style="display: flex; align-items: center; border: 3px solid #ba6b3c; border-radius: 60px; margin: 15px 0;">
                 <span class="phone-prefix" style="padding: 15px; background: #d49b3b; border-radius: 60px 0 0 60px; font-weight: 700; color: white;">+7</span>
                 <input type="tel" id="modalPhoneInput" class="modal-input" placeholder="(999) 999-99-99" maxlength="10" style="border: none; margin: 0;">
             </div>
-            <div id="clientCrownsInfo" class="client-info" style="display: none;">
-                <i class="fas fa-crown"></i>
-                <span id="clientCrownsCount">0</span> корон доступно
+            <div id="clientInfoModal" class="client-info" style="display: none;">
+                <i class="fas fa-user"></i>
+                <span id="clientNameModal"></span>
+                <span class="client-badge" id="clientCrownsModal">0 👑</span>
             </div>
             <div class="modal-buttons">
                 <button class="modal-btn cancel" onclick="closePhoneModal()">Отмена</button>
-                <button class="modal-btn confirm" onclick="confirmPhoneForCrown()">Подтвердить</button>
+                <button class="modal-btn confirm" onclick="confirmPhoneForOrder()">Подтвердить</button>
             </div>
         </div>
     </div>
@@ -597,6 +608,14 @@
                 <div class="total">
                     <span>ИТОГО:</span>
                     <span id="totalAmount">0 ₽</span>
+                </div>
+                <div id="clientInfoPanel" style="background: #e3f2fd; padding: 10px; border-radius: 30px; margin: 10px 0; display: none;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-user" style="color: #2196F3;"></i>
+                        <span id="currentClientName"></span>
+                        <span class="client-badge" id="currentClientCrowns">0 👑</span>
+                        <button style="margin-left: auto; background: none; border: none; color: #c53a1f; cursor: pointer;" onclick="clearClient()">✕</button>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <div class="btn" onclick="clearOrder()">ОЧИСТИТЬ</div>
@@ -725,7 +744,7 @@
             { id: 71, name: 'Комбо Бизнес', price: 399, category: 'combo' },
             { id: 72, name: 'Комбо Пикник', price: 599, category: 'combo' },
             
-            // Товары за 1 рубль (12 позиций - дублируем популярные)
+            // Товары за 1 рубль (12 позиций)
             { id: 101, name: 'Воппер (1₽)', price: 1, category: 'crown', crownCost: 10 },
             { id: 102, name: 'Чизбургер (1₽)', price: 1, category: 'crown', crownCost: 4 },
             { id: 103, name: 'Двойной Воппер (1₽)', price: 1, category: 'crown', crownCost: 16 },
@@ -747,8 +766,14 @@
         let totalCrowns = 0;
         let deliveryCount = 0;
         let autoOrdersInterval;
-        let pendingCrownProduct = null; // Для временного хранения товара за 1р
-        let currentClientPhone = null; // Для хранения телефона текущего клиента
+        
+        // Данные текущего клиента для заказа
+        let currentClient = {
+            phone: null,
+            userId: null,
+            name: null,
+            crowns: 0
+        };
 
         window.checkPassword = () => {
             const password = document.getElementById('passwordInput').value;
@@ -908,10 +933,25 @@
 
         // Обработка клика на товар за 1 рубль
         function handleCrownProductClick(product) {
-            pendingCrownProduct = product;
-            document.getElementById('phoneModal').style.display = 'flex';
-            document.getElementById('modalPhoneInput').value = '';
-            document.getElementById('clientCrownsInfo').style.display = 'none';
+            // Если клиент уже выбран, добавляем товар сразу
+            if (currentClient.phone) {
+                // Проверяем, хватает ли корон
+                const totalCrownsNeeded = currentOrder
+                    .filter(item => item.category === 'crown')
+                    .reduce((acc, item) => acc + (item.crownCost || 0) * item.quantity, 0) + (product.crownCost || 0);
+                
+                if (currentClient.crowns >= totalCrownsNeeded) {
+                    addToOrder(product);
+                } else {
+                    alert(`❌ У клиента недостаточно корон. Доступно: ${currentClient.crowns}, нужно: ${totalCrownsNeeded}`);
+                }
+            } else {
+                // Если клиент не выбран, показываем модальное окно
+                pendingCrownProduct = product;
+                document.getElementById('phoneModal').style.display = 'flex';
+                document.getElementById('modalPhoneInput').value = '';
+                document.getElementById('clientInfoModal').style.display = 'none';
+            }
         }
 
         window.closePhoneModal = () => {
@@ -919,7 +959,7 @@
             pendingCrownProduct = null;
         };
 
-        window.confirmPhoneForCrown = () => {
+        window.confirmPhoneForOrder = () => {
             const phone = document.getElementById('modalPhoneInput').value.trim();
             if (!phone || phone.length < 10) {
                 alert('Введите номер телефона полностью');
@@ -927,7 +967,6 @@
             }
 
             const fullPhone = '+7' + phone;
-            currentClientPhone = fullPhone; // Сохраняем телефон для текущего заказа
             
             // Ищем пользователя по телефону
             db.ref('users').orderByChild('phone').equalTo(fullPhone).once('value', (snapshot) => {
@@ -939,44 +978,79 @@
                     });
 
                     if (userData) {
-                        const userCrowns = userData.crowns || 0;
-                        const crownCost = pendingCrownProduct.crownCost || 0;
+                        // Сохраняем данные клиента
+                        currentClient = {
+                            phone: fullPhone,
+                            userId: userData.id,
+                            name: userData.name || 'Клиент',
+                            crowns: userData.crowns || 0
+                        };
                         
-                        if (userCrowns >= crownCost) {
-                            // Списываем короны
-                            const newCrowns = userCrowns - crownCost;
-                            db.ref('users/' + userData.id + '/crowns').set(newCrowns);
+                        // Обновляем отображение
+                        document.getElementById('clientInfoPanel').style.display = 'block';
+                        document.getElementById('currentClientName').innerText = currentClient.name;
+                        document.getElementById('currentClientCrowns').innerText = currentClient.crowns + ' 👑';
+                        
+                        // Если был товар в ожидании, добавляем его
+                        if (pendingCrownProduct) {
+                            const totalCrownsNeeded = currentOrder
+                                .filter(item => item.category === 'crown')
+                                .reduce((acc, item) => acc + (item.crownCost || 0) * item.quantity, 0) + (pendingCrownProduct.crownCost || 0);
                             
-                            // Добавляем товар с полной информацией о клиенте
-                            addToOrder({
-                                ...pendingCrownProduct,
-                                usedCrowns: true,
-                                clientPhone: fullPhone,
-                                clientName: userData.name || 'Клиент',
-                                userId: userData.id
-                            });
-                            
-                            showNotification(`✅ Товар за 1₽ для ${userData.name || 'клиента'}`);
-                            closePhoneModal();
-                        } else {
-                            alert(`❌ У клиента недостаточно корон. Доступно: ${userCrowns}, нужно: ${crownCost}`);
+                            if (currentClient.crowns >= totalCrownsNeeded) {
+                                addToOrder(pendingCrownProduct);
+                                showNotification(`✅ Товар добавлен для ${currentClient.name}`);
+                            } else {
+                                alert(`❌ У клиента недостаточно корон. Доступно: ${currentClient.crowns}, нужно: ${totalCrownsNeeded}`);
+                            }
                         }
+                        
+                        closePhoneModal();
                     }
                 } else {
                     // Если клиент не найден, создаём нового
-                    if (confirm('Клиент не найден. Добавить товар за полную стоимость?')) {
-                        addToOrder({
-                            ...pendingCrownProduct,
-                            price: pendingCrownProduct.price, // Оставляем 1 рубль
-                            usedCrowns: true,
-                            clientPhone: fullPhone,
-                            clientName: 'Новый клиент',
-                            isNewClient: true
+                    if (confirm('Клиент не найден. Создать нового пользователя?')) {
+                        const newUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        const newUser = {
+                            id: newUserId,
+                            phone: fullPhone,
+                            name: 'Клиент',
+                            crowns: 0,
+                            addresses: []
+                        };
+                        
+                        db.ref('users/' + newUserId).set(newUser).then(() => {
+                            currentClient = {
+                                phone: fullPhone,
+                                userId: newUserId,
+                                name: 'Клиент',
+                                crowns: 0
+                            };
+                            
+                            document.getElementById('clientInfoPanel').style.display = 'block';
+                            document.getElementById('currentClientName').innerText = currentClient.name;
+                            document.getElementById('currentClientCrowns').innerText = '0 👑';
+                            
+                            if (pendingCrownProduct) {
+                                addToOrder(pendingCrownProduct);
+                                showNotification(`✅ Товар добавлен для нового клиента`);
+                            }
+                            
+                            closePhoneModal();
                         });
-                        closePhoneModal();
                     }
                 }
             });
+        };
+
+        window.clearClient = () => {
+            currentClient = {
+                phone: null,
+                userId: null,
+                name: null,
+                crowns: 0
+            };
+            document.getElementById('clientInfoPanel').style.display = 'none';
         };
 
         function addToOrder(product) {
@@ -1022,7 +1096,6 @@
             currentOrder.forEach(item => {
                 total += item.price * item.quantity;
                 const crownText = item.crownCost ? `<span class="crown-icon"><i class="fas fa-crown"></i> ${item.crownCost * item.quantity}</span>` : '';
-                const clientInfo = item.clientName ? `<div style="font-size:0.8rem; color:#2196F3;">📱 ${item.clientName} (${item.clientPhone})</div>` : '';
                 
                 html += `
                     <div class="order-item">
@@ -1031,7 +1104,6 @@
                                 ${item.name} x${item.quantity}
                                 ${crownText}
                             </span>
-                            ${clientInfo}
                         </div>
                         <div class="item-controls">
                             <span>${item.price * item.quantity} ₽</span>
@@ -1047,7 +1119,7 @@
 
         function clearOrder() {
             currentOrder = [];
-            currentClientPhone = null;
+            clearClient();
             updateOrderDisplay();
         }
 
@@ -1058,11 +1130,13 @@
             const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
             const crownEarned = Math.floor(total / 100);
             
-            // Проверяем, есть ли товары с указанием клиента
-            const hasClientItems = currentOrder.some(item => item.clientPhone);
+            // Проверяем, есть ли товары за 1 рубль и выбран ли клиент
+            const hasCrownItems = currentOrder.some(item => item.category === 'crown');
             
-            // Если есть товары с клиентом, используем первый попавшийся телефон
-            const clientPhone = currentOrder.find(item => item.clientPhone)?.clientPhone || currentClientPhone;
+            if (hasCrownItems && !currentClient.phone) {
+                alert('❌ Для товаров за 1 рубль необходимо ввести номер телефона клиента');
+                return;
+            }
 
             const orderData = {
                 items: currentOrder,
@@ -1077,50 +1151,32 @@
                 isCashierOrder: true
             };
 
-            // Если есть телефон клиента, добавляем информацию о нём
-            if (clientPhone) {
-                orderData.clientPhone = clientPhone;
-                orderData.userName = currentOrder.find(item => item.clientName)?.clientName || 'Клиент кассы';
+            // Если есть клиент, добавляем информацию о нём
+            if (currentClient.phone) {
+                orderData.clientPhone = currentClient.phone;
+                orderData.userName = currentClient.name;
+                orderData.userId = currentClient.userId;
                 
-                // Ищем userId для этого телефона
-                db.ref('users').orderByChild('phone').equalTo(clientPhone).once('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        snapshot.forEach((child) => {
-                            orderData.userId = child.key;
-                            
-                            // Сохраняем заказ с userId
-                            db.ref('orders/' + orderNum).set(orderData).then(() => {
-                                alert(`✅ Заказ #${orderNum} оплачен для клиента ${orderData.userName}`);
-                                currentOrder = [];
-                                currentClientPhone = null;
-                                currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
-                                document.getElementById('orderNumber').innerText = currentOrderNumber;
-                                updateOrderDisplay();
-                            });
-                        });
-                    } else {
-                        // Если пользователь не найден, создаём нового
-                        const newUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                        const newUser = {
-                            id: newUserId,
-                            phone: clientPhone,
-                            name: orderData.userName,
-                            crowns: 0,
-                            addresses: []
-                        };
-                        
-                        db.ref('users/' + newUserId).set(newUser).then(() => {
-                            orderData.userId = newUserId;
-                            db.ref('orders/' + orderNum).set(orderData).then(() => {
-                                alert(`✅ Заказ #${orderNum} оплачен для нового клиента ${orderData.userName}`);
-                                currentOrder = [];
-                                currentClientPhone = null;
-                                currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
-                                document.getElementById('orderNumber').innerText = currentOrderNumber;
-                                updateOrderDisplay();
-                            });
-                        });
-                    }
+                // Списываем короны за товары за 1 рубль
+                const totalCrownsSpent = currentOrder
+                    .filter(item => item.category === 'crown')
+                    .reduce((acc, item) => acc + (item.crownCost || 0) * item.quantity, 0);
+                
+                if (totalCrownsSpent > 0) {
+                    const newCrowns = currentClient.crowns - totalCrownsSpent;
+                    db.ref('users/' + currentClient.userId + '/crowns').set(newCrowns);
+                    orderData.crownsSpent = totalCrownsSpent;
+                }
+
+                // Сохраняем заказ с userId
+                db.ref('orders/' + orderNum).set(orderData).then(() => {
+                    alert(`✅ Заказ #${orderNum} оплачен для клиента ${currentClient.name}`);
+                    showNotification(`📱 Заказ появится в истории клиента`);
+                    currentOrder = [];
+                    clearClient();
+                    currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
+                    document.getElementById('orderNumber').innerText = currentOrderNumber;
+                    updateOrderDisplay();
                 });
             } else {
                 // Обычный заказ без клиента
@@ -1182,12 +1238,13 @@
                 
                 const totalCrowns = data.items.reduce((acc, i) => acc + (i.crownCost || 0) * i.quantity, 0);
                 const clientInfo = data.clientPhone ? `<div style="font-size:0.8rem; color:#2196F3;">📱 ${data.userName || 'Клиент'} (${data.clientPhone})</div>` : '';
+                const sourceIcon = data.isCashierOrder ? '🏪' : '📱';
                 
                 if (data.status === 'waiting') {
                     waitingHtml += `
                         <div class="order-card">
                             <div class="order-header">
-                                <span class="order-number">${isAuto} #${num}</span>
+                                <span class="order-number">${sourceIcon} ${isAuto} #${num}</span>
                                 <span class="status-badge status-waiting">⏳ Готовится</span>
                             </div>
                             <div>
@@ -1206,7 +1263,7 @@
                     readyHtml += `
                         <div class="order-card">
                             <div class="order-header">
-                                <span class="order-number">${isAuto} #${num}</span>
+                                <span class="order-number">${sourceIcon} ${isAuto} #${num}</span>
                                 <span class="status-badge status-ready">✅ Готов</span>
                             </div>
                             <div>
@@ -1230,7 +1287,7 @@
                     readyHtml += `
                         <div class="order-card">
                             <div class="order-header">
-                                <span class="order-number">${isAuto} #${num}</span>
+                                <span class="order-number">${sourceIcon} ${isAuto} #${num}</span>
                                 <span class="status-badge status-courier">🚚 У курьера</span>
                             </div>
                             <div>
