@@ -1007,32 +1007,11 @@
             });
         }
 
-        // Функция для обновления текущего заказа на планшете
-        function updateTabletCurrentOrder() {
-            if (currentOrder.length > 0) {
-                db.ref('currentOrder').set({
-                    items: currentOrder,
-                    total: currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0)
-                });
-            } else {
-                db.ref('currentOrder').set(null);
-            }
-        }
-
-        // Функция для отправки оплаченного заказа на планшет
-        function sendPaidOrderToTablet(orderNum) {
-            db.ref('paidOrders').push({
-                orderNum: orderNum,
-                timestamp: Date.now()
-            });
-            
-            // Очищаем текущий заказ на планшете
-            db.ref('currentOrder').set(null);
-        }
-
         // Обработка клика на товар за 1 рубль
         function handleCrownProductClick(product) {
+            // Если клиент уже выбран, добавляем товар сразу
             if (currentClient.phone) {
+                // Проверяем, хватает ли корон
                 const totalCrownsNeeded = currentOrder
                     .filter(item => item.category === 'crown')
                     .reduce((acc, item) => acc + (item.crownCost || 0) * item.quantity, 0) + (product.crownCost || 0);
@@ -1043,6 +1022,7 @@
                     alert(`❌ У клиента недостаточно корон. Доступно: ${currentClient.crowns}, нужно: ${totalCrownsNeeded}`);
                 }
             } else {
+                // Если клиент не выбран, показываем модальное окно
                 pendingCrownProduct = product;
                 document.getElementById('phoneModal').style.display = 'flex';
                 document.getElementById('modalPhoneInput').value = '';
@@ -1056,6 +1036,7 @@
         };
 
         window.skipPhone = () => {
+            // Добавляем товар без привязки к аккаунту
             if (pendingCrownProduct) {
                 addToOrder(pendingCrownProduct);
                 showNotification(`✅ Товар добавлен без аккаунта`);
@@ -1073,6 +1054,7 @@
 
             const fullPhone = '+7' + phone;
             
+            // Ищем пользователя по телефону
             db.ref('users').orderByChild('phone').equalTo(fullPhone).once('value', (snapshot) => {
                 if (snapshot.exists()) {
                     let userData = null;
@@ -1082,6 +1064,7 @@
                     });
 
                     if (userData) {
+                        // Сохраняем данные клиента
                         currentClient = {
                             phone: fullPhone,
                             userId: userData.id,
@@ -1089,10 +1072,12 @@
                             crowns: userData.crowns || 0
                         };
                         
+                        // Обновляем отображение
                         document.getElementById('clientInfoPanel').style.display = 'block';
                         document.getElementById('currentClientName').innerText = currentClient.name;
                         document.getElementById('currentClientCrowns').innerText = currentClient.crowns + ' 👑';
                         
+                        // Если был товар в ожидании, добавляем его
                         if (pendingCrownProduct) {
                             const totalCrownsNeeded = currentOrder
                                 .filter(item => item.category === 'crown')
@@ -1109,6 +1094,7 @@
                         closePhoneModal();
                     }
                 } else {
+                    // Если клиент не найден, создаём нового
                     if (confirm('Клиент не найден. Создать нового пользователя?')) {
                         const newUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                         const newUser = {
@@ -1164,7 +1150,6 @@
                 });
             }
             updateOrderDisplay();
-            updateTabletCurrentOrder(); // Отправляем на планшет
         }
 
         function removeOneFromOrder(id) {
@@ -1175,13 +1160,11 @@
                 currentOrder.splice(index, 1);
             }
             updateOrderDisplay();
-            updateTabletCurrentOrder(); // Отправляем на планшет
         }
 
         function removeAllFromOrder(id) {
             currentOrder = currentOrder.filter(i => i.id !== id);
             updateOrderDisplay();
-            updateTabletCurrentOrder(); // Отправляем на планшет
         }
 
         function updateOrderDisplay() {
@@ -1224,9 +1207,9 @@
             currentOrder = [];
             clearClient();
             updateOrderDisplay();
-            updateTabletCurrentOrder(); // Очищаем на планшете
         }
 
+        // Показать модальное окно оплаты
         window.showPaymentModal = (method) => {
             if (currentOrder.length === 0) {
                 alert('Корзина пуста');
@@ -1239,14 +1222,17 @@
             document.getElementById('paymentModal').style.display = 'flex';
         };
 
+        // Подтверждение оплаты
         window.confirmPayment = (success) => {
             document.getElementById('paymentModal').style.display = 'none';
             
             if (success) {
+                // Успешная оплата
                 const orderNum = currentOrderNumber;
                 const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
                 const crownEarned = Math.floor(total / 100);
                 
+                // Проверяем, есть ли товары за 1 рубль и выбран ли клиент
                 const hasCrownItems = currentOrder.some(item => item.category === 'crown');
                 
                 if (hasCrownItems && !currentClient.phone) {
@@ -1261,17 +1247,19 @@
                     total: total,
                     crownsEarned: crownEarned,
                     orderType: 'restaurant',
-                    status: 'waiting',
+                    status: 'waiting', // Статус сразу "Готовится"
                     createdAt: Date.now(),
                     paymentMethod: currentPaymentMethod,
                     isCashierOrder: true
                 };
 
+                // Если есть клиент, добавляем информацию о нём
                 if (currentClient.phone) {
                     orderData.clientPhone = currentClient.phone;
                     orderData.userName = currentClient.name;
                     orderData.userId = currentClient.userId;
                     
+                    // Списываем короны за товары за 1 рубль
                     const totalCrownsSpent = currentOrder
                         .filter(item => item.category === 'crown')
                         .reduce((acc, item) => acc + (item.crownCost || 0) * item.quantity, 0);
@@ -1282,12 +1270,10 @@
                         orderData.crownsSpent = totalCrownsSpent;
                     }
 
+                    // Сохраняем заказ с userId
                     db.ref('orders/' + orderNum).set(orderData).then(() => {
                         alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН`);
                         showNotification(`📱 Заказ появится в истории клиента`);
-                        
-                        // Отправляем на планшет
-                        sendPaidOrderToTablet(orderNum);
                         
                         currentOrder = [];
                         clearClient();
@@ -1296,12 +1282,9 @@
                         updateOrderDisplay();
                     });
                 } else {
+                    // Обычный заказ без клиента
                     db.ref('orders/' + orderNum).set(orderData).then(() => {
                         alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН`);
-                        
-                        // Отправляем на планшет
-                        sendPaidOrderToTablet(orderNum);
-                        
                         currentOrder = [];
                         currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
                         document.getElementById('orderNumber').innerText = currentOrderNumber;
@@ -1309,7 +1292,9 @@
                     });
                 }
             } else {
+                // Отказ от оплаты
                 alert('❌ ОТКАЗ ОТ ОПЛАТЫ');
+                // Возвращаемся к заказу без изменений
             }
             
             currentPaymentMethod = null;
@@ -1337,6 +1322,7 @@
                         db.ref('crowns/total').transaction(current => (current || 0) + order.crownsEarned);
                     }
                 } else if (order.status === 'courier') {
+                    // Удаляем из списков кассы, но оставляем в базе
                     delete orders[orderNum];
                 } else if (orders[orderNum]) {
                     orders[orderNum].status = order.status;
@@ -1428,6 +1414,7 @@
                     status: 'courier', 
                     courierAt: Date.now() 
                 }).then(() => {
+                    // Удаляем из локального массива, чтобы заказ исчез из кассы
                     delete orders[orderNum];
                     updateIssueDisplay();
                     showNotification(`🚚 Заказ #${orderNum} передан курьеру и удалён из кассы`);
