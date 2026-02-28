@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
+        /* Стили остаются такими же, как в предыдущей версии */
         * {
             margin: 0;
             padding: 0;
@@ -1155,7 +1156,7 @@
             if (currentClient.phone) {
                 orderData.clientPhone = currentClient.phone;
                 orderData.userName = currentClient.name;
-                orderData.userId = currentClient.userId;
+                orderData.userId = currentClient.userId; // ВАЖНО: добавляем userId
                 
                 // Списываем короны за товары за 1 рубль
                 const totalCrownsSpent = currentOrder
@@ -1172,6 +1173,10 @@
                 db.ref('orders/' + orderNum).set(orderData).then(() => {
                     alert(`✅ Заказ #${orderNum} оплачен для клиента ${currentClient.name}`);
                     showNotification(`📱 Заказ появится в истории клиента`);
+                    
+                    // Проверяем, что заказ сохранился с userId
+                    console.log('Заказ сохранён с userId:', currentClient.userId);
+                    
                     currentOrder = [];
                     clearClient();
                     currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
