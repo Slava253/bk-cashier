@@ -388,6 +388,15 @@
             margin: 5px 0;
         }
 
+        .timer-info {
+            background: #fff2d7;
+            padding: 5px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            text-align: center;
+            margin: 5px 0;
+        }
+
         .action-btn {
             border: none;
             padding: 10px;
@@ -470,6 +479,7 @@
                     <button class="cat-btn" data-cat="drink">🥤 НАПИТКИ</button>
                     <button class="cat-btn" data-cat="dessert">🍰 ДЕСЕРТЫ</button>
                     <button class="cat-btn" data-cat="combo">📦 КОМБО</button>
+                    <button class="cat-btn" data-cat="crown">👑 ЗА 1₽</button>
                 </div>
                 <div class="products-grid" id="productsGrid"></div>
                 <div style="margin-top: 10px; color: #666; text-align: center;">
@@ -530,80 +540,101 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ========== ТОВАРЫ ==========
+        // ========== ВСЕ ТОВАРЫ (80+ ПОЗИЦИЙ) ==========
         const products = [
-            { id: 1, name: 'Воппер', price: 199, category: 'burger', crownCost: 10 },
-            { id: 2, name: 'Чизбургер', price: 89, category: 'burger', crownCost: 4 },
-            { id: 3, name: 'Двойной Воппер', price: 329, category: 'burger', crownCost: 16 },
-            { id: 4, name: 'Тройной Воппер', price: 449, category: 'burger', crownCost: 22 },
-            { id: 5, name: 'Воппер с сыром', price: 249, category: 'burger', crownCost: 12 },
-            { id: 6, name: 'Бекон Воппер', price: 299, category: 'burger', crownCost: 15 },
-            { id: 7, name: 'Стейкхаус', price: 279, category: 'burger', crownCost: 14 },
-            { id: 8, name: 'Барбекю Воппер', price: 289, category: 'burger', crownCost: 14 },
-            { id: 9, name: 'Гамбургер', price: 69, category: 'burger', crownCost: 3 },
-            { id: 10, name: 'Биг Кинг', price: 279, category: 'burger', crownCost: 14 },
-            { id: 11, name: 'Королевский', price: 359, category: 'burger', crownCost: 18 },
-            { id: 12, name: 'Острый Воппер', price: 269, category: 'burger', crownCost: 13 },
-            { id: 13, name: 'Гриль Воппер', price: 289, category: 'burger', crownCost: 14 },
-            { id: 14, name: 'Чикен Бургер', price: 129, category: 'burger', crownCost: 6 },
-            { id: 15, name: 'Фиш Бургер', price: 169, category: 'burger', crownCost: 8 },
-            { id: 16, name: 'Лонг Чикен', price: 219, category: 'chicken', crownCost: 11 },
-            { id: 17, name: 'Лонг Чикен BBQ', price: 239, category: 'chicken', crownCost: 12 },
-            { id: 18, name: 'Лонг Чикен Ранч', price: 239, category: 'chicken', crownCost: 12 },
-            { id: 19, name: 'Стрипсы 3шт', price: 149, category: 'chicken', crownCost: 7 },
-            { id: 20, name: 'Стрипсы 6шт', price: 269, category: 'chicken', crownCost: 13 },
-            { id: 21, name: 'Стрипсы 9шт', price: 369, category: 'chicken', crownCost: 18 },
-            { id: 22, name: 'Наггетсы 6шт', price: 159, category: 'chicken', crownCost: 8 },
-            { id: 23, name: 'Наггетсы 9шт', price: 219, category: 'chicken', crownCost: 11 },
-            { id: 24, name: 'Наггетсы 15шт', price: 329, category: 'chicken', crownCost: 16 },
-            { id: 25, name: 'Крылья 6шт', price: 239, category: 'chicken', crownCost: 12 },
-            { id: 26, name: 'Крылья 9шт', price: 329, category: 'chicken', crownCost: 16 },
-            { id: 27, name: 'Крылья 15шт', price: 499, category: 'chicken', crownCost: 25 },
-            { id: 28, name: 'Картофель фри мал', price: 89, category: 'snack', crownCost: 4 },
-            { id: 29, name: 'Картофель фри ср', price: 119, category: 'snack', crownCost: 6 },
-            { id: 30, name: 'Картофель фри бол', price: 149, category: 'snack', crownCost: 7 },
-            { id: 31, name: 'Картофель по-дерев', price: 139, category: 'snack', crownCost: 7 },
-            { id: 32, name: 'Луковые кольца', price: 139, category: 'snack', crownCost: 7 },
-            { id: 33, name: 'Сырные палочки', price: 159, category: 'snack', crownCost: 8 },
-            { id: 34, name: 'Хот-дог', price: 119, category: 'snack', crownCost: 6 },
-            { id: 35, name: 'Чесночные гренки', price: 99, category: 'snack', crownCost: 5 },
-            { id: 36, name: 'Картофель с сыром', price: 169, category: 'snack', crownCost: 8 },
-            { id: 37, name: 'Моцарелла', price: 179, category: 'snack', crownCost: 9 },
-            { id: 38, name: 'Чипсы', price: 79, category: 'snack', crownCost: 4 },
-            { id: 39, name: 'Кесадилья', price: 199, category: 'snack', crownCost: 10 },
-            { id: 40, name: 'Кола 0.3л', price: 79, category: 'drink', crownCost: 4 },
-            { id: 41, name: 'Кола 0.5л', price: 119, category: 'drink', crownCost: 6 },
-            { id: 42, name: 'Кола 1л', price: 179, category: 'drink', crownCost: 9 },
-            { id: 43, name: 'Фанта 0.3л', price: 79, category: 'drink', crownCost: 4 },
-            { id: 44, name: 'Фанта 0.5л', price: 119, category: 'drink', crownCost: 6 },
-            { id: 45, name: 'Спрайт 0.3л', price: 79, category: 'drink', crownCost: 4 },
-            { id: 46, name: 'Спрайт 0.5л', price: 119, category: 'drink', crownCost: 6 },
-            { id: 47, name: 'Морс', price: 109, category: 'drink', crownCost: 5 },
-            { id: 48, name: 'Айс-ти лимон', price: 89, category: 'drink', crownCost: 4 },
-            { id: 49, name: 'Айс-ти персик', price: 89, category: 'drink', crownCost: 4 },
-            { id: 50, name: 'Милкшейк', price: 169, category: 'drink', crownCost: 8 },
-            { id: 51, name: 'Кофе американо', price: 99, category: 'drink', crownCost: 5 },
-            { id: 52, name: 'Кофе латте', price: 149, category: 'drink', crownCost: 7 },
-            { id: 53, name: 'Капучино', price: 149, category: 'drink', crownCost: 7 },
-            { id: 54, name: 'Горячий шоколад', price: 129, category: 'drink', crownCost: 6 },
-            { id: 55, name: 'Пирожок вишня', price: 89, category: 'dessert', crownCost: 4 },
-            { id: 56, name: 'Пирожок яблоко', price: 89, category: 'dessert', crownCost: 4 },
-            { id: 57, name: 'Мороженое', price: 69, category: 'dessert', crownCost: 3 },
-            { id: 58, name: 'Мороженое с сиропом', price: 99, category: 'dessert', crownCost: 5 },
-            { id: 59, name: 'Чизкейк', price: 199, category: 'dessert', crownCost: 10 },
-            { id: 60, name: 'Брауни', price: 149, category: 'dessert', crownCost: 7 },
-            { id: 61, name: 'Маффин', price: 119, category: 'dessert', crownCost: 6 },
-            { id: 62, name: 'Пончик', price: 79, category: 'dessert', crownCost: 4 },
-            { id: 63, name: 'Эклер', price: 99, category: 'dessert', crownCost: 5 },
-            { id: 64, name: 'Тирамису', price: 229, category: 'dessert', crownCost: 11 },
-            { id: 65, name: 'Комбо Воппер', price: 349, category: 'combo', crownCost: 17 },
-            { id: 66, name: 'Комбо Чикен', price: 329, category: 'combo', crownCost: 16 },
-            { id: 67, name: 'Комбо Стрипсы', price: 299, category: 'combo', crownCost: 15 },
-            { id: 68, name: 'Комбо Наггетсы', price: 289, category: 'combo', crownCost: 14 },
-            { id: 69, name: 'Комбо Семейное', price: 799, category: 'combo', crownCost: 40 },
-            { id: 70, name: 'Комбо Детское', price: 229, category: 'combo', crownCost: 11 },
-            { id: 71, name: 'Комбо Бизнес', price: 399, category: 'combo', crownCost: 20 },
-            { id: 72, name: 'Комбо Пикник', price: 599, category: 'combo', crownCost: 30 }
+            // Бургеры (15)
+            { id: 1, name: 'Воппер', price: 199, category: 'burger' },
+            { id: 2, name: 'Чизбургер', price: 89, category: 'burger' },
+            { id: 3, name: 'Двойной Воппер', price: 329, category: 'burger' },
+            { id: 4, name: 'Тройной Воппер', price: 449, category: 'burger' },
+            { id: 5, name: 'Воппер с сыром', price: 249, category: 'burger' },
+            { id: 6, name: 'Бекон Воппер', price: 299, category: 'burger' },
+            { id: 7, name: 'Стейкхаус', price: 279, category: 'burger' },
+            { id: 8, name: 'Барбекю Воппер', price: 289, category: 'burger' },
+            { id: 9, name: 'Гамбургер', price: 69, category: 'burger' },
+            { id: 10, name: 'Биг Кинг', price: 279, category: 'burger' },
+            { id: 11, name: 'Королевский', price: 359, category: 'burger' },
+            { id: 12, name: 'Острый Воппер', price: 269, category: 'burger' },
+            { id: 13, name: 'Гриль Воппер', price: 289, category: 'burger' },
+            { id: 14, name: 'Чикен Бургер', price: 129, category: 'burger' },
+            { id: 15, name: 'Фиш Бургер', price: 169, category: 'burger' },
+
+            // Чикен (12)
+            { id: 16, name: 'Лонг Чикен', price: 219, category: 'chicken' },
+            { id: 17, name: 'Лонг Чикен BBQ', price: 239, category: 'chicken' },
+            { id: 18, name: 'Лонг Чикен Ранч', price: 239, category: 'chicken' },
+            { id: 19, name: 'Стрипсы 3шт', price: 149, category: 'chicken' },
+            { id: 20, name: 'Стрипсы 6шт', price: 269, category: 'chicken' },
+            { id: 21, name: 'Стрипсы 9шт', price: 369, category: 'chicken' },
+            { id: 22, name: 'Наггетсы 6шт', price: 159, category: 'chicken' },
+            { id: 23, name: 'Наггетсы 9шт', price: 219, category: 'chicken' },
+            { id: 24, name: 'Наггетсы 15шт', price: 329, category: 'chicken' },
+            { id: 25, name: 'Крылья 6шт', price: 239, category: 'chicken' },
+            { id: 26, name: 'Крылья 9шт', price: 329, category: 'chicken' },
+            { id: 27, name: 'Крылья 15шт', price: 499, category: 'chicken' },
+
+            // Снэки (12)
+            { id: 28, name: 'Картофель фри мал', price: 89, category: 'snack' },
+            { id: 29, name: 'Картофель фри ср', price: 119, category: 'snack' },
+            { id: 30, name: 'Картофель фри бол', price: 149, category: 'snack' },
+            { id: 31, name: 'Картофель по-дерев', price: 139, category: 'snack' },
+            { id: 32, name: 'Луковые кольца', price: 139, category: 'snack' },
+            { id: 33, name: 'Сырные палочки', price: 159, category: 'snack' },
+            { id: 34, name: 'Хот-дог', price: 119, category: 'snack' },
+            { id: 35, name: 'Чесночные гренки', price: 99, category: 'snack' },
+            { id: 36, name: 'Картофель с сыром', price: 169, category: 'snack' },
+            { id: 37, name: 'Моцарелла', price: 179, category: 'snack' },
+            { id: 38, name: 'Чипсы', price: 79, category: 'snack' },
+            { id: 39, name: 'Кесадилья', price: 199, category: 'snack' },
+
+            // Напитки (15)
+            { id: 40, name: 'Кола 0.3л', price: 79, category: 'drink' },
+            { id: 41, name: 'Кола 0.5л', price: 119, category: 'drink' },
+            { id: 42, name: 'Кола 1л', price: 179, category: 'drink' },
+            { id: 43, name: 'Фанта 0.3л', price: 79, category: 'drink' },
+            { id: 44, name: 'Фанта 0.5л', price: 119, category: 'drink' },
+            { id: 45, name: 'Спрайт 0.3л', price: 79, category: 'drink' },
+            { id: 46, name: 'Спрайт 0.5л', price: 119, category: 'drink' },
+            { id: 47, name: 'Морс', price: 109, category: 'drink' },
+            { id: 48, name: 'Айс-ти лимон', price: 89, category: 'drink' },
+            { id: 49, name: 'Айс-ти персик', price: 89, category: 'drink' },
+            { id: 50, name: 'Милкшейк', price: 169, category: 'drink' },
+            { id: 51, name: 'Кофе американо', price: 99, category: 'drink' },
+            { id: 52, name: 'Кофе латте', price: 149, category: 'drink' },
+            { id: 53, name: 'Капучино', price: 149, category: 'drink' },
+            { id: 54, name: 'Горячий шоколад', price: 129, category: 'drink' },
+
+            // Десерты (10)
+            { id: 55, name: 'Пирожок вишня', price: 89, category: 'dessert' },
+            { id: 56, name: 'Пирожок яблоко', price: 89, category: 'dessert' },
+            { id: 57, name: 'Мороженое', price: 69, category: 'dessert' },
+            { id: 58, name: 'Мороженое с сиропом', price: 99, category: 'dessert' },
+            { id: 59, name: 'Чизкейк', price: 199, category: 'dessert' },
+            { id: 60, name: 'Брауни', price: 149, category: 'dessert' },
+            { id: 61, name: 'Маффин', price: 119, category: 'dessert' },
+            { id: 62, name: 'Пончик', price: 79, category: 'dessert' },
+            { id: 63, name: 'Эклер', price: 99, category: 'dessert' },
+            { id: 64, name: 'Тирамису', price: 229, category: 'dessert' },
+
+            // Комбо (8)
+            { id: 65, name: 'Комбо Воппер', price: 349, category: 'combo' },
+            { id: 66, name: 'Комбо Чикен', price: 329, category: 'combo' },
+            { id: 67, name: 'Комбо Стрипсы', price: 299, category: 'combo' },
+            { id: 68, name: 'Комбо Наггетсы', price: 289, category: 'combo' },
+            { id: 69, name: 'Комбо Семейное', price: 799, category: 'combo' },
+            { id: 70, name: 'Комбо Детское', price: 229, category: 'combo' },
+            { id: 71, name: 'Комбо Бизнес', price: 399, category: 'combo' },
+            { id: 72, name: 'Комбо Пикник', price: 599, category: 'combo' },
+            
+            // Товары за 1 рубль (8)
+            { id: 101, name: 'Воппер (1₽)', price: 1, category: 'crown', crownCost: 10 },
+            { id: 102, name: 'Чизбургер (1₽)', price: 1, category: 'crown', crownCost: 4 },
+            { id: 103, name: 'Картофель фри (1₽)', price: 1, category: 'crown', crownCost: 6 },
+            { id: 104, name: 'Кола (1₽)', price: 1, category: 'crown', crownCost: 5 },
+            { id: 105, name: 'Пирожок (1₽)', price: 1, category: 'crown', crownCost: 4 },
+            { id: 106, name: 'Наггетсы 3шт (1₽)', price: 1, category: 'crown', crownCost: 8 },
+            { id: 107, name: 'Мороженое (1₽)', price: 1, category: 'crown', crownCost: 3 },
+            { id: 108, name: 'Стрипсы 3шт (1₽)', price: 1, category: 'crown', crownCost: 7 }
         ];
 
         let currentOrder = [];
@@ -631,6 +662,7 @@
             renderProducts();
             setupFirebaseListener();
             startAutoOrders();
+            startAutoDeliveryCompletion();
             setInterval(updateTime, 1000);
         }
 
@@ -673,7 +705,7 @@
                             name: randomProduct.name, 
                             price: randomProduct.price, 
                             quantity: randomQuantity,
-                            crownCost: randomProduct.crownCost
+                            crownCost: randomProduct.crownCost || 0
                         });
                     }
                 }
@@ -700,6 +732,31 @@
             }, 10000);
         }
 
+        function startAutoDeliveryCompletion() {
+            setInterval(() => {
+                const now = Date.now();
+                const fiveMinutes = 5 * 60 * 1000;
+
+                Object.entries(orders).forEach(([num, data]) => {
+                    if (data.orderType === 'delivery' && data.status === 'courier' && data.courierAt) {
+                        if (now - data.courierAt >= fiveMinutes) {
+                            db.ref('orders/' + num).update({ 
+                                status: 'done', 
+                                doneAt: now,
+                                autoCompleted: true
+                            });
+                            
+                            if (data.crownsEarned) {
+                                db.ref('crowns/total').transaction(current => (current || 0) + data.crownsEarned);
+                            }
+                            
+                            showNotification(`✅ Заказ #${num} автоматически завершен`);
+                        }
+                    }
+                });
+            }, 10000);
+        }
+
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -720,10 +777,18 @@
             filtered.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
+                if (p.category === 'crown') {
+                    card.classList.add('crown');
+                }
+                
+                let priceHtml = `<div class="product-price">${p.price} ₽</div>`;
+                if (p.crownCost) {
+                    priceHtml = `<div class="product-price">${p.price} ₽ <span class="crown-cost"><i class="fas fa-crown"></i> ${p.crownCost}</span></div>`;
+                }
+                
                 card.innerHTML = `
                     <div class="product-name">${p.name}</div>
-                    <div class="product-price">${p.price} ₽</div>
-                    <div class="crown-cost"><i class="fas fa-crown"></i> ${p.crownCost}</div>
+                    ${priceHtml}
                 `;
                 card.onclick = () => addToOrder(p);
                 grid.appendChild(card);
@@ -772,11 +837,13 @@
             let total = 0;
             currentOrder.forEach(item => {
                 total += item.price * item.quantity;
+                const crownText = item.crownCost ? `<span class="crown-icon"><i class="fas fa-crown"></i> ${item.crownCost * item.quantity}</span>` : '';
+                
                 html += `
                     <div class="order-item">
                         <span>
                             ${item.name} x${item.quantity}
-                            <span class="crown-icon"><i class="fas fa-crown"></i> ${item.crownCost * item.quantity}</span>
+                            ${crownText}
                         </span>
                         <div class="item-controls">
                             <span>${item.price * item.quantity} ₽</span>
@@ -827,7 +894,7 @@
                 const order = snapshot.val();
                 const orderNum = snapshot.key;
                 
-                if (order.status !== 'done' && order.status !== 'courier') {
+                if (order.status !== 'done') {
                     orders[orderNum] = { ...order, status: order.status || 'waiting' };
                     showNotification('Новый заказ #' + orderNum);
                     updateIssueDisplay();
@@ -838,13 +905,15 @@
                 const order = snapshot.val();
                 const orderNum = snapshot.key;
                 
-                if (order.status === 'done' || order.status === 'courier') {
+                if (order.status === 'done') {
                     delete orders[orderNum];
-                    if (order.crownsEarned && order.status === 'done') {
+                    if (order.crownsEarned) {
                         db.ref('crowns/total').transaction(current => (current || 0) + order.crownsEarned);
                     }
                 } else if (orders[orderNum]) {
                     orders[orderNum].status = order.status;
+                    if (order.courierAt) orders[orderNum].courierAt = order.courierAt;
+                    if (order.readyAt) orders[orderNum].readyAt = order.readyAt;
                 }
                 
                 updateIssueDisplay();
@@ -859,7 +928,7 @@
             let readyHtml = '';
             
             Object.entries(orders).forEach(([num, data]) => {
-                if (data.status === 'done' || data.status === 'courier') return;
+                if (data.status === 'done') return;
                 
                 const itemsList = data.items.map(i => `${i.name} x${i.quantity}`).join(', ');
                 const isAuto = data.isAuto ? '<span class="auto-badge">🤖 АВТО</span>' : '';
@@ -906,6 +975,26 @@
                             }
                         </div>
                     `;
+                } else if (data.status === 'courier') {
+                    const minutesPassed = data.courierAt ? Math.floor((Date.now() - data.courierAt) / 60000) : 0;
+                    const minutesLeft = Math.max(0, 5 - minutesPassed);
+                    
+                    readyHtml += `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <span class="order-number">${isAuto} #${num}</span>
+                                <span class="status-badge status-courier">🚚 У курьера</span>
+                            </div>
+                            <div>
+                                <span class="order-type-badge ${typeClass}">${typeIcon} Доставка</span>
+                            </div>
+                            <div style="margin: 8px 0;">👤 ${data.userName || 'Клиент'}</div>
+                            <div>${itemsList}</div>
+                            <div>Сумма: ${data.total} ₽</div>
+                            ${data.address ? `<div class="delivery-info"><i class="fas fa-map-marker-alt"></i> ${data.address}</div>` : ''}
+                            <div class="timer-info">⏱️ Авто-завершение через ${minutesLeft} мин</div>
+                        </div>
+                    `;
                 }
             });
             
@@ -924,8 +1013,11 @@
         window.markAsCourier = (orderNum) => {
             if (orders[orderNum]) {
                 orders[orderNum].status = 'courier';
-                db.ref('orders/' + orderNum).update({ status: 'courier', courierAt: Date.now() });
-                delete orders[orderNum];
+                orders[orderNum].courierAt = Date.now();
+                db.ref('orders/' + orderNum).update({ 
+                    status: 'courier', 
+                    courierAt: Date.now() 
+                });
                 updateIssueDisplay();
                 showNotification(`🚚 Заказ #${orderNum} передан курьеру`);
             }
