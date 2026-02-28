@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        /* Стили остаются такими же, как в предыдущей версии */
         * {
             margin: 0;
             padding: 0;
@@ -1156,7 +1155,7 @@
             if (currentClient.phone) {
                 orderData.clientPhone = currentClient.phone;
                 orderData.userName = currentClient.name;
-                orderData.userId = currentClient.userId; // ВАЖНО: добавляем userId
+                orderData.userId = currentClient.userId;
                 
                 // Списываем короны за товары за 1 рубль
                 const totalCrownsSpent = currentOrder
@@ -1173,9 +1172,6 @@
                 db.ref('orders/' + orderNum).set(orderData).then(() => {
                     alert(`✅ Заказ #${orderNum} оплачен для клиента ${currentClient.name}`);
                     showNotification(`📱 Заказ появится в истории клиента`);
-                    
-                    // Проверяем, что заказ сохранился с userId
-                    console.log('Заказ сохранён с userId:', currentClient.userId);
                     
                     currentOrder = [];
                     clearClient();
@@ -1200,7 +1196,7 @@
                 const order = snapshot.val();
                 const orderNum = snapshot.key;
                 
-                if (order.status !== 'done') {
+                if (order.status !== 'done' && order.status !== 'courier') {
                     orders[orderNum] = { ...order, status: order.status || 'waiting' };
                     showNotification('Новый заказ #' + orderNum);
                     updateIssueDisplay();
@@ -1216,6 +1212,9 @@
                     if (order.crownsEarned) {
                         db.ref('crowns/total').transaction(current => (current || 0) + order.crownsEarned);
                     }
+                } else if (order.status === 'courier') {
+                    // Удаляем из списков кассы, но оставляем в базе
+                    delete orders[orderNum];
                 } else if (orders[orderNum]) {
                     orders[orderNum].status = order.status;
                     if (order.courierAt) orders[orderNum].courierAt = order.courierAt;
@@ -1234,7 +1233,7 @@
             let readyHtml = '';
             
             Object.entries(orders).forEach(([num, data]) => {
-                if (data.status === 'done') return;
+                if (data.status === 'done' || data.status === 'courier') return;
                 
                 const itemsList = data.items.map(i => `${i.name} x${i.quantity}`).join(', ');
                 const isAuto = data.isAuto ? '<span class="auto-badge">🤖 АВТО</span>' : '';
@@ -1285,27 +1284,6 @@
                             }
                         </div>
                     `;
-                } else if (data.status === 'courier') {
-                    const minutesPassed = data.courierAt ? Math.floor((Date.now() - data.courierAt) / 60000) : 0;
-                    const minutesLeft = Math.max(0, 5 - minutesPassed);
-                    
-                    readyHtml += `
-                        <div class="order-card">
-                            <div class="order-header">
-                                <span class="order-number">${sourceIcon} ${isAuto} #${num}</span>
-                                <span class="status-badge status-courier">🚚 У курьера</span>
-                            </div>
-                            <div>
-                                <span class="order-type-badge ${typeClass}">${typeIcon} Доставка</span>
-                            </div>
-                            <div style="margin: 8px 0;">👤 ${data.userName || 'Клиент'}</div>
-                            ${clientInfo}
-                            <div>${itemsList}</div>
-                            <div>Сумма: ${data.total} ₽</div>
-                            ${data.address ? `<div class="delivery-info"><i class="fas fa-map-marker-alt"></i> ${data.address}</div>` : ''}
-                            <div class="timer-info">⏱️ Авто-завершение через ${minutesLeft} мин</div>
-                        </div>
-                    `;
                 }
             });
             
@@ -1323,22 +1301,24 @@
 
         window.markAsCourier = (orderNum) => {
             if (orders[orderNum]) {
-                orders[orderNum].status = 'courier';
-                orders[orderNum].courierAt = Date.now();
                 db.ref('orders/' + orderNum).update({ 
                     status: 'courier', 
                     courierAt: Date.now() 
+                }).then(() => {
+                    // Удаляем из локального массива, чтобы заказ исчез из кассы
+                    delete orders[orderNum];
+                    updateIssueDisplay();
+                    showNotification(`🚚 Заказ #${orderNum} передан курьеру и удалён из кассы`);
                 });
-                updateIssueDisplay();
-                showNotification(`🚚 Заказ #${orderNum} передан курьеру`);
             }
         };
 
         window.markAsDone = (orderNum) => {
             if (orders[orderNum]) {
-                db.ref('orders/' + orderNum).update({ status: 'done', doneAt: Date.now() });
-                delete orders[orderNum];
-                updateIssueDisplay();
+                db.ref('orders/' + orderNum).update({ status: 'done', doneAt: Date.now() }).then(() => {
+                    delete orders[orderNum];
+                    updateIssueDisplay();
+                });
             }
         };
 
