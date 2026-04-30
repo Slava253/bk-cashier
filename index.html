@@ -499,10 +499,6 @@
             gap: 10px;
         }
 
-        .client-info i {
-            color: #2196F3;
-        }
-
         .client-badge {
             background: #4CAF50;
             color: white;
@@ -586,23 +582,6 @@
             <input type="password" id="passwordInput" class="auth-input" placeholder="Пароль" autofocus>
             <button class="auth-btn" onclick="checkPassword()">Войти</button>
             <p style="margin-top: 20px; color: #666;">Пароль: 2347</p>
-        </div>
-    </div>
-
-    <!-- Модальное окно для ввода телефона (обычный заказ) -->
-    <div id="phoneModal" class="phone-modal">
-        <div class="modal-content">
-            <h3>📱 Введите номер телефона</h3>
-            <p style="text-align: center; margin-bottom: 10px;">Для привязки заказа к аккаунту</p>
-            <div class="phone-input" style="display: flex; align-items: center; border: 3px solid #ba6b3c; border-radius: 60px; margin: 15px 0;">
-                <span class="phone-prefix" style="padding: 15px; background: #d49b3b; border-radius: 60px 0 0 60px; font-weight: 700; color: white;">+7</span>
-                <input type="tel" id="modalPhoneInput" class="modal-input" placeholder="(999) 999-99-99" maxlength="10" style="border: none; margin: 0;">
-            </div>
-            <div class="modal-buttons">
-                <button class="modal-btn cancel" onclick="closePhoneModal()">Отмена</button>
-                <button class="modal-btn confirm" onclick="confirmPhoneForOrder()">Подтвердить</button>
-            </div>
-            <button class="auth-btn" style="margin-top: 10px; background: #4CAF50;" onclick="skipPhone()">Нет аккаунта (заказ без телефона)</button>
         </div>
     </div>
 
@@ -691,14 +670,6 @@
                     <span>ИТОГО:</span>
                     <span id="totalAmount">0 ₽</span>
                 </div>
-                <div id="clientInfoPanel" style="background: #e3f2fd; padding: 10px; border-radius: 30px; margin: 10px 0; display: none;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-user" style="color: #2196F3;"></i>
-                        <span id="currentClientName"></span>
-                        <span class="client-badge" id="currentClientCrowns">0 👑</span>
-                        <button style="margin-left: auto; background: none; border: none; color: #c53a1f; cursor: pointer;" onclick="clearClient()">✕</button>
-                    </div>
-                </div>
                 <div style="display: flex; gap: 10px;">
                     <div class="btn" onclick="clearOrder()">ОЧИСТИТЬ</div>
                     <div class="btn green" onclick="showPaymentMethodSelector()">ОПЛАТИТЬ</div>
@@ -718,7 +689,7 @@
             <div class="issue-panel">
                 <div class="section-title">
                     <i class="fas fa-check-circle"></i>
-                    <span>ГОТОВЫ К ВЫДАЧЕ/ОТПРАВКЕ</span>
+                    <span>ГОТОВЫ К ВЫДАЧЕ</span>
                 </div>
                 <div class="order-items" id="readyOrders"></div>
             </div>
@@ -727,7 +698,7 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyBlZ5ZtyTXgtXxSXJAx1jOxwhTrzlHRJmo",
+            apiKey: "AIzaSyBlZ5ZtyTXgtXxSJAx1jOxwhTrzlHRJmo",
             authDomain: "bk-cashier.firebaseapp.com",
             databaseURL: "https://bk-cashier-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "bk-cashier",
@@ -833,15 +804,7 @@
         let totalCrowns = 0;
         let deliveryCount = 0;
         let autoOrdersInterval;
-        let currentPaymentMethod = null;
         let pendingOrderPhone = null;
-        
-        let currentClient = {
-            phone: null,
-            userId: null,
-            name: null,
-            crowns: 0
-        };
 
         window.checkPassword = () => {
             const password = document.getElementById('passwordInput').value;
@@ -860,7 +823,6 @@
             renderProducts();
             setupFirebaseListener();
             startAutoOrders();
-            startAutoDeliveryCompletion();
             setInterval(updateTime, 1000);
         }
 
@@ -887,8 +849,6 @@
                 const randomItems = [];
                 const names = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Анна', 'Иван', 'Ольга'];
                 const randomName = names[Math.floor(Math.random() * names.length)];
-                const orderTypes = ['restaurant', 'delivery'];
-                const randomType = orderTypes[Math.floor(Math.random() * orderTypes.length)];
                 
                 for (let i = 0; i < numItems; i++) {
                     const randomProduct = products[Math.floor(Math.random() * products.length)];
@@ -910,59 +870,23 @@
 
                 const orderNum = Math.floor(1000 + Math.random() * 9000);
                 const subtotal = randomItems.reduce((acc, i) => acc + i.price * i.quantity, 0);
-                const delivery = randomType === 'delivery' ? 99 : 0;
-                const total = subtotal + delivery;
+                const total = subtotal;
                 const crownEarned = Math.floor(total / 100);
 
                 db.ref('orders/' + orderNum).set({
                     userName: randomName,
                     items: randomItems,
                     subtotal: subtotal,
-                    delivery: delivery,
+                    delivery: 0,
                     total: total,
                     crownsEarned: crownEarned,
-                    orderType: randomType,
-                    address: randomType === 'delivery' ? 'ул. Автоматическая, ' + Math.floor(Math.random() * 100) : null,
+                    orderType: 'restaurant',
                     status: 'waiting',
                     createdAt: Date.now(),
                     isAuto: true
                 });
             }, 10000);
         }
-
-        function startAutoDeliveryCompletion() {
-            setInterval(() => {
-                const now = Date.now();
-                const fiveMinutes = 5 * 60 * 1000;
-
-                Object.entries(orders).forEach(([num, data]) => {
-                    if (data.orderType === 'delivery' && data.status === 'courier' && data.courierAt) {
-                        if (now - data.courierAt >= fiveMinutes) {
-                            db.ref('orders/' + num).update({ 
-                                status: 'done', 
-                                doneAt: now,
-                                autoCompleted: true
-                            });
-                            
-                            if (data.crownsEarned) {
-                                db.ref('crowns/total').transaction(current => (current || 0) + data.crownsEarned);
-                            }
-                            
-                            showNotification(`✅ Заказ #${num} автоматически завершен`);
-                        }
-                    }
-                });
-            }, 10000);
-        }
-
-        document.querySelectorAll('.cat-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentCategory = this.dataset.cat;
-                renderProducts();
-            });
-        });
 
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
@@ -1061,7 +985,6 @@
 
         function clearOrder() {
             currentOrder = [];
-            clearClient();
             updateOrderDisplay();
         }
 
@@ -1070,7 +993,6 @@
                 alert('Корзина пуста');
                 return;
             }
-            // Показываем модальное окно для ввода телефона
             document.getElementById('orderPhoneModal').style.display = 'flex';
             document.getElementById('orderPhoneInput').value = '';
         };
@@ -1082,12 +1004,9 @@
         window.confirmOrderWithPhone = () => {
             const phone = document.getElementById('orderPhoneInput').value.trim();
             const fullPhone = '+7' + phone;
-            
-            // Сохраняем телефон и показываем выбор оплаты
             pendingOrderPhone = fullPhone;
             document.getElementById('orderPhoneModal').style.display = 'none';
             
-            // Показываем выбор способа оплаты
             const method = confirm('💰 Выберите способ оплаты:\n\n✅ "OK" - НАЛИЧНЫЕ\n❌ "Отмена" - КАРТА');
             if (method) {
                 processOrderWithPhone('cash');
@@ -1101,7 +1020,6 @@
             const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
             const crownEarned = Math.floor(total / 100);
             
-            // Ищем пользователя по телефону
             db.ref('users').orderByChild('phone').equalTo(pendingOrderPhone).once('value', (snapshot) => {
                 let userData = null;
                 let userId = null;
@@ -1130,7 +1048,6 @@
                 };
                 
                 if (!userData && pendingOrderPhone) {
-                    // Создаём нового пользователя, если не найден
                     const newUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                     const newUser = {
                         id: newUserId,
@@ -1144,13 +1061,9 @@
                     
                     db.ref('users/' + newUserId).set(newUser).then(() => {
                         db.ref('orders/' + orderNum).set(orderData).then(() => {
-                            alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН ${method === 'cash' ? 'НАЛИЧНЫМИ' : 'КАРТОЙ'}`);
-                            if (pendingOrderPhone) {
-                                showNotification(`📱 Заказ #${orderNum} привязан к номеру ${pendingOrderPhone}`);
-                            }
-                            
+                            alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН`);
+                            showNotification(`📱 Заказ #${orderNum} привязан к номеру ${pendingOrderPhone}`);
                             currentOrder = [];
-                            clearClient();
                             currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
                             document.getElementById('orderNumber').innerText = currentOrderNumber;
                             updateOrderDisplay();
@@ -1159,13 +1072,9 @@
                     });
                 } else {
                     db.ref('orders/' + orderNum).set(orderData).then(() => {
-                        alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН ${method === 'cash' ? 'НАЛИЧНЫМИ' : 'КАРТОЙ'}`);
-                        if (pendingOrderPhone) {
-                            showNotification(`📱 Заказ #${orderNum} привязан к номеру ${pendingOrderPhone}`);
-                        }
-                        
+                        alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН`);
+                        showNotification(`📱 Заказ #${orderNum} привязан к номеру ${pendingOrderPhone}`);
                         currentOrder = [];
-                        clearClient();
                         currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
                         document.getElementById('orderNumber').innerText = currentOrderNumber;
                         updateOrderDisplay();
@@ -1174,16 +1083,6 @@
                 }
             });
         }
-
-        window.clearClient = () => {
-            currentClient = {
-                phone: null,
-                userId: null,
-                name: null,
-                crowns: 0
-            };
-            document.getElementById('clientInfoPanel').style.display = 'none';
-        };
 
         function setupFirebaseListener() {
             db.ref('orders').on('child_added', (snapshot) => {
@@ -1210,7 +1109,6 @@
                     delete orders[orderNum];
                 } else if (orders[orderNum]) {
                     orders[orderNum].status = order.status;
-                    if (order.courierAt) orders[orderNum].courierAt = order.courierAt;
                     if (order.readyAt) orders[orderNum].readyAt = order.readyAt;
                 }
                 
@@ -1227,15 +1125,12 @@
             
             Object.entries(orders).forEach(([num, data]) => {
                 if (data.status === 'done' || data.status === 'courier') return;
+                if (data.orderType !== 'restaurant') return;
                 
                 const itemsList = data.items.map(i => `${i.name} x${i.quantity}`).join(', ');
                 const isAuto = data.isAuto ? '<span class="auto-badge">🤖 АВТО</span>' : '';
-                const typeIcon = data.orderType === 'delivery' ? '🚚' : '🏪';
-                const typeClass = data.orderType === 'delivery' ? 'type-delivery' : 'type-restaurant';
-                
-                const totalCrowns = data.items.reduce((acc, i) => acc + (i.crownCost || 0) * i.quantity, 0);
-                const clientInfo = data.clientPhone ? `<div style="font-size:0.8rem; color:#2196F3;">📱 ${data.userName || 'Клиент'} (${data.clientPhone})</div>` : '';
                 const sourceIcon = data.isCashierOrder ? '🏪' : '📱';
+                const clientInfo = data.clientPhone ? `<div style="font-size:0.8rem; color:#2196F3;">📱 ${data.userName || 'Клиент'}</div>` : '';
                 
                 if (data.status === 'waiting') {
                     waitingHtml += `
@@ -1244,15 +1139,10 @@
                                 <span class="order-number">${sourceIcon} ${isAuto} #${num}</span>
                                 <span class="status-badge status-waiting">⏳ Готовится</span>
                             </div>
-                            <div>
-                                <span class="order-type-badge ${typeClass}">${typeIcon} ${data.orderType === 'delivery' ? 'Доставка' : 'В ресторане'}</span>
-                            </div>
                             <div style="margin: 8px 0;">👤 ${data.userName || 'Клиент'}</div>
                             ${clientInfo}
                             <div>${itemsList}</div>
-                            <div class="crowns-info"><i class="fas fa-crown"></i> +${data.crownsEarned || 0} (в товарах: ${totalCrowns})</div>
-                            <div>Сумма: ${data.total} ₽ ${data.delivery ? `(доставка: ${data.delivery} ₽)` : ''}</div>
-                            ${data.address ? `<div class="delivery-info"><i class="fas fa-map-marker-alt"></i> ${data.address}</div>` : ''}
+                            <div>Сумма: ${data.total} ₽</div>
                             <button class="action-btn ready-btn" onclick="markAsReady('${num}')">✅ ГОТОВО</button>
                         </div>
                     `;
@@ -1263,18 +1153,11 @@
                                 <span class="order-number">${sourceIcon} ${isAuto} #${num}</span>
                                 <span class="status-badge status-ready">✅ Готов</span>
                             </div>
-                            <div>
-                                <span class="order-type-badge ${typeClass}">${typeIcon} ${data.orderType === 'delivery' ? 'Доставка' : 'В ресторане'}</span>
-                            </div>
                             <div style="margin: 8px 0;">👤 ${data.userName || 'Клиент'}</div>
                             ${clientInfo}
                             <div>${itemsList}</div>
                             <div>Сумма: ${data.total} ₽</div>
-                            ${data.address ? `<div class="delivery-info"><i class="fas fa-map-marker-alt"></i> ${data.address}</div>` : ''}
-                            ${data.orderType === 'delivery' 
-                                ? `<button class="action-btn courier-btn" onclick="markAsCourier('${num}')">🚚 ПЕРЕДАТЬ КУРЬЕРУ</button>`
-                                : `<button class="action-btn complete-btn" onclick="markAsDone('${num}')">🛒 ВЫДАН</button>`
-                            }
+                            <button class="action-btn complete-btn" onclick="markAsDone('${num}')">🛒 ВЫДАН</button>
                         </div>
                     `;
                 }
@@ -1289,19 +1172,6 @@
                 orders[orderNum].status = 'ready';
                 db.ref('orders/' + orderNum).update({ status: 'ready', readyAt: Date.now() });
                 updateIssueDisplay();
-            }
-        };
-
-        window.markAsCourier = (orderNum) => {
-            if (orders[orderNum]) {
-                db.ref('orders/' + orderNum).update({ 
-                    status: 'courier', 
-                    courierAt: Date.now() 
-                }).then(() => {
-                    delete orders[orderNum];
-                    updateIssueDisplay();
-                    showNotification(`🚚 Заказ #${orderNum} передан курьеру и удалён из кассы`);
-                });
             }
         };
 
@@ -1337,6 +1207,15 @@
 
         window.removeOneFromOrder = removeOneFromOrder;
         window.removeAllFromOrder = removeAllFromOrder;
+
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentCategory = this.dataset.cat;
+                renderProducts();
+            });
+        });
     </script>
 </body>
 </html>
