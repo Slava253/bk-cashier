@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👑 WHOPPER BAR • КАССА</title>
+    <title>WHOPPER BAR • КАССА</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,7 +14,6 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', sans-serif;
         }
-
         body {
             background: #2b1b0e;
             min-height: 100vh;
@@ -23,7 +22,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .auth-screen {
             background: linear-gradient(145deg, #4a3a2a, #2d1d0c);
             padding: 30px;
@@ -32,20 +30,17 @@
             max-width: 400px;
             text-align: center;
         }
-
         .auth-card {
             background: white;
             padding: 40px 30px;
             border-radius: 50px;
             border: 5px solid #fec233;
         }
-
         .auth-card h2 {
             color: #c53a1f;
             font-size: 2rem;
             margin-bottom: 30px;
         }
-
         .auth-input {
             width: 100%;
             padding: 15px;
@@ -55,7 +50,6 @@
             margin: 15px 0;
             text-align: center;
         }
-
         .auth-btn {
             background: #d49b3b;
             color: white;
@@ -68,12 +62,10 @@
             font-weight: 700;
             box-shadow: 0 4px 0 #7e491e;
         }
-
         .auth-btn:active {
             transform: translateY(4px);
             box-shadow: none;
         }
-
         .terminal {
             max-width: 1600px;
             width: 100%;
@@ -83,7 +75,6 @@
             border: 3px solid #fec233;
             display: none;
         }
-
         .header {
             background: #d62323;
             padding: 16px 28px;
@@ -93,7 +84,6 @@
             color: white;
             border-bottom: 4px solid #b81c1c;
         }
-
         .logo {
             display: flex;
             align-items: center;
@@ -101,25 +91,39 @@
             font-size: 1.8rem;
             font-weight: 800;
         }
-
         .stats {
             display: flex;
             gap: 20px;
         }
-
         .stat {
             background: #2d2d2d;
             padding: 8px 20px;
             border-radius: 40px;
             border: 2px solid #fec233;
         }
-
+        .tabs {
+            display: flex;
+            gap: 10px;
+            padding: 20px 30px;
+        }
+        .tab {
+            background: #5c3e1f;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 40px;
+            cursor: pointer;
+            border: 2px solid #fec233;
+            font-weight: 700;
+        }
+        .tab.active {
+            background: #fec233;
+            color: #2d1d0c;
+        }
         .workspace {
             display: flex;
             padding: 20px 30px;
             gap: 30px;
         }
-
         .menu-panel {
             flex: 2;
             background: #fef9ef;
@@ -127,14 +131,12 @@
             border-radius: 30px;
             border: 3px dashed #d4a373;
         }
-
-        .check-panel {
+        .check-panel, .issue-panel {
             flex: 1;
             background: #e7dbc6;
             padding: 20px;
             border-radius: 30px;
         }
-
         .section-title {
             font-size: 1.5rem;
             font-weight: 800;
@@ -144,14 +146,12 @@
             align-items: center;
             gap: 10px;
         }
-
         .category-tabs {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
             margin-bottom: 20px;
         }
-
         .cat-btn {
             background: #f0dbb8;
             border: none;
@@ -160,12 +160,10 @@
             cursor: pointer;
             font-weight: 600;
         }
-
         .cat-btn.active {
             background: #c53a1f;
             color: white;
         }
-
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -174,7 +172,6 @@
             overflow-y: auto;
             padding: 5px;
         }
-
         .product-card {
             background: white;
             border-radius: 20px;
@@ -186,27 +183,22 @@
             transition: 0.1s;
             position: relative;
         }
-
         .product-card:active {
             transform: translateY(4px);
             box-shadow: none;
         }
-
         .product-card.crown {
             border: 3px solid #9c27b0;
             background: #f3e5f5;
         }
-
         .product-name {
             font-weight: 700;
             margin-bottom: 5px;
         }
-
         .product-price {
             font-weight: 800;
             color: #c1411b;
         }
-
         .crown-cost {
             position: absolute;
             top: -8px;
@@ -220,7 +212,6 @@
             align-items: center;
             gap: 3px;
         }
-
         .order-items {
             background: #f5ede1;
             border-radius: 20px;
@@ -229,7 +220,6 @@
             max-height: 300px;
             overflow-y: auto;
         }
-
         .order-item {
             display: flex;
             justify-content: space-between;
@@ -237,13 +227,11 @@
             padding: 8px 0;
             border-bottom: 1px solid #cbad86;
         }
-
         .item-controls {
             display: flex;
             gap: 5px;
             align-items: center;
         }
-
         .item-btn {
             background: #c53a1f;
             color: white;
@@ -254,16 +242,9 @@
             cursor: pointer;
             font-weight: 700;
         }
-
         .item-btn.minus {
             background: #ff9800;
         }
-
-        .crown-icon {
-            color: #9c27b0;
-            margin-left: 5px;
-        }
-
         .total {
             background: #312713;
             color: #fddc9c;
@@ -274,7 +255,6 @@
             justify-content: space-between;
             margin: 15px 0;
         }
-
         .btn {
             background: #fcf3e4;
             border: 3px solid #ba6b3c;
@@ -286,15 +266,49 @@
             margin: 5px;
             box-shadow: 0 4px 0 #8f542e;
         }
-
         .btn:active {
             transform: translateY(4px);
             box-shadow: none;
         }
-
         .btn.green { background: #d49b3b; color: white; }
         .btn.red { background: #bd4b27; color: white; }
-
+        .order-card {
+            background: #fff2d7;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 3px solid #ba6b3c;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+        .order-number {
+            font-size: 1.3rem;
+            color: #c53a1f;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+        .status-waiting { background: #ff9800; color: white; }
+        .status-ready { background: #4CAF50; color: white; }
+        .status-courier { background: #2196F3; color: white; }
+        .action-btn {
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .ready-btn { background: #4CAF50; color: white; }
+        .complete-btn { background: #fec233; color: #2d1d0c; }
         .notification {
             position: fixed;
             top: 20px;
@@ -307,8 +321,7 @@
             display: none;
             z-index: 1000;
         }
-
-        .phone-modal {
+        .phone-modal, .payment-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -320,23 +333,20 @@
             justify-content: center;
             align-items: center;
         }
-
-        .modal-content {
+        .modal-content, .payment-content {
             background: white;
             padding: 40px;
             border-radius: 60px;
             max-width: 400px;
             width: 90%;
             border: 5px solid #fec233;
+            text-align: center;
         }
-
-        .modal-content h3 {
+        .modal-content h3, .payment-content h2 {
             color: #c53a1f;
             font-size: 1.8rem;
             margin-bottom: 20px;
-            text-align: center;
         }
-
         .modal-input {
             width: 100%;
             padding: 15px;
@@ -346,13 +356,11 @@
             margin: 15px 0;
             text-align: center;
         }
-
         .modal-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
-
         .modal-btn {
             flex: 1;
             padding: 15px;
@@ -361,46 +369,8 @@
             font-weight: 700;
             cursor: pointer;
         }
-
-        .modal-btn.confirm {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .modal-btn.cancel {
-            background: #c53a1f;
-            color: white;
-        }
-
-        .payment-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 2500;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .payment-content {
-            background: white;
-            padding: 40px;
-            border-radius: 60px;
-            max-width: 450px;
-            width: 90%;
-            border: 5px solid #fec233;
-            text-align: center;
-        }
-
-        .payment-content h2 {
-            color: #c53a1f;
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
+        .modal-btn.confirm { background: #4CAF50; color: white; }
+        .modal-btn.cancel { background: #c53a1f; color: white; }
         .payment-amount {
             font-size: 3rem;
             font-weight: 800;
@@ -410,13 +380,11 @@
             background: #fff2d7;
             border-radius: 40px;
         }
-
         .payment-buttons {
             display: flex;
             gap: 15px;
             margin-top: 30px;
         }
-
         .payment-btn {
             flex: 1;
             padding: 20px;
@@ -426,16 +394,8 @@
             font-size: 1.3rem;
             cursor: pointer;
         }
-
-        .payment-btn.yes {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .payment-btn.no {
-            background: #c53a1f;
-            color: white;
-        }
+        .payment-btn.yes { background: #4CAF50; color: white; }
+        .payment-btn.no { background: #c53a1f; color: white; }
     </style>
 </head>
 <body>
@@ -448,14 +408,12 @@
         </div>
     </div>
 
-    <!-- Модальное окно для ввода телефона -->
     <div id="orderPhoneModal" class="phone-modal">
         <div class="modal-content">
-            <h3>📱 Введите номер телефона клиента</h3>
-            <p style="text-align: center; margin-bottom: 10px;">Заказ появится в истории клиента</p>
-            <div class="phone-input" style="display: flex; align-items: center; border: 3px solid #ba6b3c; border-radius: 60px; margin: 15px 0;">
-                <span class="phone-prefix" style="padding: 15px; background: #d49b3b; border-radius: 60px 0 0 60px; font-weight: 700; color: white;">+7</span>
-                <input type="tel" id="orderPhoneInput" class="modal-input" placeholder="(999) 999-99-99" maxlength="10" style="border: none; margin: 0;">
+            <h3>📱 Номер телефона</h3>
+            <div style="display: flex; align-items: center; border: 3px solid #ba6b3c; border-radius: 60px; margin: 15px 0;">
+                <span style="padding: 15px; background: #d49b3b; border-radius: 60px 0 0 60px; font-weight: 700; color: white;">+7</span>
+                <input type="tel" id="orderPhoneInput" placeholder="(999) 999-99-99" maxlength="10" style="flex:1; border:none; padding:15px; border-radius:60px; outline:none;">
             </div>
             <div class="modal-buttons">
                 <button class="modal-btn cancel" onclick="closeOrderPhoneModal()">Отмена</button>
@@ -464,13 +422,11 @@
         </div>
     </div>
 
-    <!-- Модальное окно подтверждения оплаты -->
     <div id="paymentModal" class="payment-modal">
         <div class="payment-content">
             <h2>💳 Подтверждение оплаты</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 10px;">Сумма к оплате:</p>
             <div class="payment-amount" id="paymentAmount">0 ₽</div>
-            <p style="margin-bottom: 20px;">Оплата произошла успешно?</p>
+            <p>Оплата прошла успешно?</p>
             <div class="payment-buttons">
                 <button class="payment-btn yes" onclick="confirmPayment(true)">✅ ДА</button>
                 <button class="payment-btn no" onclick="confirmPayment(false)">❌ НЕТ</button>
@@ -480,57 +436,42 @@
 
     <div id="terminal" class="terminal">
         <div id="notification" class="notification">🔔 Новый заказ!</div>
-
         <div class="header">
-            <div class="logo">
-                <i class="fas fa-crown"></i>
-                <span>WHOPPER BAR • КАССА</span>
-            </div>
+            <div class="logo"><i class="fas fa-crown"></i><span>WHOPPER BAR • КАССА</span></div>
             <div class="stats">
-                <div class="stat"><i class="fas fa-clock"></i> <span id="liveTime">12:00:00</span></div>
+                <div class="stat"><i class="fas fa-clock"></i> <span id="liveTime"></span></div>
                 <div class="stat"><i class="fas fa-crown"></i> <span id="totalCrowns">0</span></div>
                 <div class="stat"><i class="fas fa-truck"></i> <span id="deliveryCount">0</span></div>
             </div>
         </div>
-
-        <div class="workspace">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('cash')">💰 КАССА</div>
+            <div class="tab" onclick="switchTab('issue')">🛒 ВЫДАЧА</div>
+        </div>
+        <div id="cashTab" class="workspace">
             <div class="menu-panel">
-                <div class="section-title">
-                    <i class="fas fa-fire"></i>
-                    <span>МЕНЮ</span>
-                </div>
-                <div class="category-tabs" id="categoryTabs">
-                    <button class="cat-btn active" data-cat="all">ВСЁ</button>
-                    <button class="cat-btn" data-cat="burger">🍔 БУРГЕРЫ</button>
-                    <button class="cat-btn" data-cat="chicken">🐔 ЧИКЕН</button>
-                    <button class="cat-btn" data-cat="snack">🍟 СНЭКИ</button>
-                    <button class="cat-btn" data-cat="drink">🥤 НАПИТКИ</button>
-                    <button class="cat-btn" data-cat="dessert">🍰 ДЕСЕРТЫ</button>
-                    <button class="cat-btn" data-cat="combo">📦 КОМБО</button>
-                    <button class="cat-btn" data-cat="crown">👑 ЗА 1₽</button>
-                </div>
+                <div class="section-title"><i class="fas fa-fire"></i><span>МЕНЮ</span></div>
+                <div class="category-tabs" id="categoryTabs"></div>
                 <div class="products-grid" id="productsGrid"></div>
-                <div style="margin-top: 10px; color: #666; text-align: center;">
-                    <i class="fas fa-sync-alt fa-spin"></i> Автозаказы каждые 10 сек
-                </div>
             </div>
-
             <div class="check-panel">
-                <div class="section-title">
-                    <i class="fas fa-receipt"></i>
-                    <span>ЗАКАЗ #<span id="orderNumber">1284</span></span>
-                </div>
-                <div class="order-items" id="orderItems">
-                    <div style="text-align:center; padding:20px;">Корзина пуста</div>
-                </div>
-                <div class="total">
-                    <span>ИТОГО:</span>
-                    <span id="totalAmount">0 ₽</span>
-                </div>
+                <div class="section-title"><i class="fas fa-receipt"></i><span>ЗАКАЗ #<span id="orderNumber">1284</span></span></div>
+                <div class="order-items" id="orderItems"></div>
+                <div class="total"><span>ИТОГО:</span><span id="totalAmount">0 ₽</span></div>
                 <div style="display: flex; gap: 10px;">
                     <div class="btn" onclick="clearOrder()">ОЧИСТИТЬ</div>
                     <div class="btn green" onclick="showPaymentMethodSelector()">ОПЛАТИТЬ</div>
                 </div>
+            </div>
+        </div>
+        <div id="issueTab" class="workspace" style="display: none;">
+            <div class="menu-panel">
+                <div class="section-title"><i class="fas fa-clock"></i><span>ГОТОВЯТСЯ</span></div>
+                <div class="order-items" id="waitingOrders"></div>
+            </div>
+            <div class="issue-panel">
+                <div class="section-title"><i class="fas fa-check-circle"></i><span>ГОТОВЫ К ВЫДАЧЕ</span></div>
+                <div class="order-items" id="readyOrders"></div>
             </div>
         </div>
     </div>
@@ -545,7 +486,6 @@
             messagingSenderId: "385000840969",
             appId: "1:385000840969:web:1ec8d09176b6551dc0fdd8"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -553,397 +493,251 @@
             { id: 1, name: 'Воппер', price: 199, category: 'burger' },
             { id: 2, name: 'Чизбургер', price: 89, category: 'burger' },
             { id: 3, name: 'Двойной Воппер', price: 329, category: 'burger' },
-            { id: 4, name: 'Тройной Воппер', price: 449, category: 'burger' },
-            { id: 5, name: 'Воппер с сыром', price: 249, category: 'burger' },
-            { id: 6, name: 'Бекон Воппер', price: 299, category: 'burger' },
-            { id: 7, name: 'Стейкхаус', price: 279, category: 'burger' },
-            { id: 8, name: 'Барбекю Воппер', price: 289, category: 'burger' },
-            { id: 9, name: 'Гамбургер', price: 69, category: 'burger' },
-            { id: 10, name: 'Биг Кинг', price: 279, category: 'burger' },
-            { id: 11, name: 'Королевский', price: 359, category: 'burger' },
-            { id: 12, name: 'Острый Воппер', price: 269, category: 'burger' },
-            { id: 13, name: 'Гриль Воппер', price: 289, category: 'burger' },
-            { id: 14, name: 'Чикен Бургер', price: 129, category: 'burger' },
-            { id: 15, name: 'Фиш Бургер', price: 169, category: 'burger' },
-            { id: 16, name: 'Лонг Чикен', price: 219, category: 'chicken' },
-            { id: 17, name: 'Лонг Чикен BBQ', price: 239, category: 'chicken' },
-            { id: 18, name: 'Лонг Чикен Ранч', price: 239, category: 'chicken' },
-            { id: 19, name: 'Стрипсы 3шт', price: 149, category: 'chicken' },
-            { id: 20, name: 'Стрипсы 6шт', price: 269, category: 'chicken' },
-            { id: 21, name: 'Стрипсы 9шт', price: 369, category: 'chicken' },
-            { id: 22, name: 'Наггетсы 6шт', price: 159, category: 'chicken' },
-            { id: 23, name: 'Наггетсы 9шт', price: 219, category: 'chicken' },
-            { id: 24, name: 'Наггетсы 15шт', price: 329, category: 'chicken' },
-            { id: 25, name: 'Крылья 6шт', price: 239, category: 'chicken' },
-            { id: 26, name: 'Крылья 9шт', price: 329, category: 'chicken' },
-            { id: 27, name: 'Крылья 15шт', price: 499, category: 'chicken' },
-            { id: 28, name: 'Картофель фри мал', price: 89, category: 'snack' },
-            { id: 29, name: 'Картофель фри ср', price: 119, category: 'snack' },
-            { id: 30, name: 'Картофель фри бол', price: 149, category: 'snack' },
-            { id: 31, name: 'Картофель по-дерев', price: 139, category: 'snack' },
-            { id: 32, name: 'Луковые кольца', price: 139, category: 'snack' },
-            { id: 33, name: 'Сырные палочки', price: 159, category: 'snack' },
-            { id: 34, name: 'Хот-дог', price: 119, category: 'snack' },
-            { id: 35, name: 'Чесночные гренки', price: 99, category: 'snack' },
-            { id: 36, name: 'Картофель с сыром', price: 169, category: 'snack' },
-            { id: 37, name: 'Моцарелла', price: 179, category: 'snack' },
-            { id: 38, name: 'Чипсы', price: 79, category: 'snack' },
-            { id: 39, name: 'Кесадилья', price: 199, category: 'snack' },
-            { id: 40, name: 'Кола 0.3л', price: 79, category: 'drink' },
-            { id: 41, name: 'Кола 0.5л', price: 119, category: 'drink' },
-            { id: 42, name: 'Кола 1л', price: 179, category: 'drink' },
-            { id: 43, name: 'Фанта 0.3л', price: 79, category: 'drink' },
-            { id: 44, name: 'Фанта 0.5л', price: 119, category: 'drink' },
-            { id: 45, name: 'Спрайт 0.3л', price: 79, category: 'drink' },
-            { id: 46, name: 'Спрайт 0.5л', price: 119, category: 'drink' },
-            { id: 47, name: 'Морс', price: 109, category: 'drink' },
-            { id: 48, name: 'Айс-ти лимон', price: 89, category: 'drink' },
-            { id: 49, name: 'Айс-ти персик', price: 89, category: 'drink' },
-            { id: 50, name: 'Милкшейк', price: 169, category: 'drink' },
-            { id: 51, name: 'Кофе американо', price: 99, category: 'drink' },
-            { id: 52, name: 'Кофе латте', price: 149, category: 'drink' },
-            { id: 53, name: 'Капучино', price: 149, category: 'drink' },
-            { id: 54, name: 'Горячий шоколад', price: 129, category: 'drink' },
-            { id: 55, name: 'Пирожок вишня', price: 89, category: 'dessert' },
-            { id: 56, name: 'Пирожок яблоко', price: 89, category: 'dessert' },
-            { id: 57, name: 'Мороженое', price: 69, category: 'dessert' },
-            { id: 58, name: 'Мороженое с сиропом', price: 99, category: 'dessert' },
-            { id: 59, name: 'Чизкейк', price: 199, category: 'dessert' },
-            { id: 60, name: 'Брауни', price: 149, category: 'dessert' },
-            { id: 61, name: 'Маффин', price: 119, category: 'dessert' },
-            { id: 62, name: 'Пончик', price: 79, category: 'dessert' },
-            { id: 63, name: 'Эклер', price: 99, category: 'dessert' },
-            { id: 64, name: 'Тирамису', price: 229, category: 'dessert' },
-            { id: 65, name: 'Комбо Воппер', price: 349, category: 'combo' },
-            { id: 66, name: 'Комбо Чикен', price: 329, category: 'combo' },
-            { id: 67, name: 'Комбо Стрипсы', price: 299, category: 'combo' },
-            { id: 68, name: 'Комбо Наггетсы', price: 289, category: 'combo' },
-            { id: 69, name: 'Комбо Семейное', price: 799, category: 'combo' },
-            { id: 70, name: 'Комбо Детское', price: 229, category: 'combo' },
-            { id: 71, name: 'Комбо Бизнес', price: 399, category: 'combo' },
-            { id: 72, name: 'Комбо Пикник', price: 599, category: 'combo' },
+            { id: 4, name: 'Воппер с сыром', price: 249, category: 'burger' },
+            { id: 5, name: 'Бекон Воппер', price: 299, category: 'burger' },
+            { id: 6, name: 'Гамбургер', price: 69, category: 'burger' },
+            { id: 7, name: 'Биг Кинг', price: 279, category: 'burger' },
+            { id: 8, name: 'Острый Воппер', price: 269, category: 'burger' },
+            { id: 9, name: 'Лонг Чикен', price: 219, category: 'chicken' },
+            { id: 10, name: 'Лонг Чикен BBQ', price: 239, category: 'chicken' },
+            { id: 11, name: 'Стрипсы 3шт', price: 149, category: 'chicken' },
+            { id: 12, name: 'Стрипсы 6шт', price: 269, category: 'chicken' },
+            { id: 13, name: 'Наггетсы 6шт', price: 159, category: 'chicken' },
+            { id: 14, name: 'Наггетсы 9шт', price: 219, category: 'chicken' },
+            { id: 15, name: 'Крылья 6шт', price: 239, category: 'chicken' },
+            { id: 16, name: 'Картофель фри мал', price: 89, category: 'snack' },
+            { id: 17, name: 'Картофель фри ср', price: 119, category: 'snack' },
+            { id: 18, name: 'Картофель фри бол', price: 149, category: 'snack' },
+            { id: 19, name: 'Луковые кольца', price: 139, category: 'snack' },
+            { id: 20, name: 'Сырные палочки', price: 159, category: 'snack' },
+            { id: 21, name: 'Хот-дог', price: 119, category: 'snack' },
+            { id: 22, name: 'Кола 0.3л', price: 79, category: 'drink' },
+            { id: 23, name: 'Кола 0.5л', price: 119, category: 'drink' },
+            { id: 24, name: 'Фанта 0.3л', price: 79, category: 'drink' },
+            { id: 25, name: 'Спрайт 0.3л', price: 79, category: 'drink' },
+            { id: 26, name: 'Морс', price: 109, category: 'drink' },
+            { id: 27, name: 'Милкшейк', price: 169, category: 'drink' },
+            { id: 28, name: 'Кофе латте', price: 149, category: 'drink' },
+            { id: 29, name: 'Пирожок вишня', price: 89, category: 'dessert' },
+            { id: 30, name: 'Пирожок яблоко', price: 89, category: 'dessert' },
+            { id: 31, name: 'Мороженое', price: 69, category: 'dessert' },
+            { id: 32, name: 'Чизкейк', price: 199, category: 'dessert' },
+            { id: 33, name: 'Брауни', price: 149, category: 'dessert' },
+            { id: 34, name: 'Комбо Воппер', price: 349, category: 'combo' },
+            { id: 35, name: 'Комбо Чикен', price: 329, category: 'combo' },
+            { id: 36, name: 'Комбо Стрипсы', price: 299, category: 'combo' },
+            { id: 37, name: 'Комбо Семейное', price: 799, category: 'combo' },
             { id: 101, name: 'Воппер (1₽)', price: 1, category: 'crown', crownCost: 10 },
             { id: 102, name: 'Чизбургер (1₽)', price: 1, category: 'crown', crownCost: 4 },
-            { id: 103, name: 'Двойной Воппер (1₽)', price: 1, category: 'crown', crownCost: 16 },
-            { id: 104, name: 'Картофель фри (1₽)', price: 1, category: 'crown', crownCost: 6 },
-            { id: 105, name: 'Кола (1₽)', price: 1, category: 'crown', crownCost: 5 },
-            { id: 106, name: 'Пирожок (1₽)', price: 1, category: 'crown', crownCost: 4 },
-            { id: 107, name: 'Наггетсы 6шт (1₽)', price: 1, category: 'crown', crownCost: 8 },
-            { id: 108, name: 'Мороженое (1₽)', price: 1, category: 'crown', crownCost: 3 },
-            { id: 109, name: 'Стрипсы 3шт (1₽)', price: 1, category: 'crown', crownCost: 7 },
-            { id: 110, name: 'Лонг Чикен (1₽)', price: 1, category: 'crown', crownCost: 11 },
-            { id: 111, name: 'Морс (1₽)', price: 1, category: 'crown', crownCost: 5 },
-            { id: 112, name: 'Чикен Бургер (1₽)', price: 1, category: 'crown', crownCost: 6 }
+            { id: 103, name: 'Картофель фри (1₽)', price: 1, category: 'crown', crownCost: 6 },
+            { id: 104, name: 'Кола (1₽)', price: 1, category: 'crown', crownCost: 5 },
+            { id: 105, name: 'Наггетсы 6шт (1₽)', price: 1, category: 'crown', crownCost: 8 }
         ];
 
-        let currentOrder = [];
+        let currentOrder = [], orders = {}, currentCategory = 'all', totalCrowns = 0, deliveryCount = 0;
         let currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
-        let currentCategory = 'all';
-        let totalCrowns = 0;
-        let deliveryCount = 0;
-        let autoOrdersInterval;
-        let pendingOrderPhone = null;
-        let currentPaymentMethod = null;
+        let pendingOrderPhone = null, currentPaymentMethod = null;
 
         window.checkPassword = () => {
-            const password = document.getElementById('passwordInput').value;
-            if (password === '2347') {
+            if (document.getElementById('passwordInput').value === '2347') {
                 document.getElementById('authScreen').style.display = 'none';
                 document.getElementById('terminal').style.display = 'block';
                 initCashier();
-            } else {
-                alert('Неверный пароль');
-            }
+            } else alert('Неверный пароль');
         };
 
         function initCashier() {
             updateTime();
             loadStats();
             renderProducts();
+            renderCategories();
+            setupFirebaseListener();
             startAutoOrders();
             setInterval(updateTime, 1000);
         }
 
         function updateTime() {
-            const now = new Date();
-            document.getElementById('liveTime').innerText = now.toLocaleTimeString('ru-RU');
+            document.getElementById('liveTime').innerText = new Date().toLocaleTimeString('ru-RU');
         }
 
         function loadStats() {
-            db.ref('crowns/total').on('value', (snapshot) => {
-                totalCrowns = snapshot.val() || 0;
-                document.getElementById('totalCrowns').innerText = totalCrowns;
-            });
-
-            db.ref('orders').orderByChild('orderType').equalTo('delivery').on('value', (snapshot) => {
-                deliveryCount = snapshot.numChildren();
-                document.getElementById('deliveryCount').innerText = deliveryCount;
-            });
+            db.ref('crowns/total').on('value', s => document.getElementById('totalCrowns').innerText = s.val() || 0);
+            db.ref('orders').orderByChild('orderType').equalTo('delivery').on('value', s => document.getElementById('deliveryCount').innerText = s.numChildren());
         }
 
         function startAutoOrders() {
-            autoOrdersInterval = setInterval(() => {
-                const numItems = Math.floor(Math.random() * 3) + 1;
-                const randomItems = [];
-                const names = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Анна', 'Иван', 'Ольга'];
-                const randomName = names[Math.floor(Math.random() * names.length)];
-                const orderTypes = ['restaurant', 'delivery'];
-                const randomType = orderTypes[Math.floor(Math.random() * orderTypes.length)];
-                
-                for (let i = 0; i < numItems; i++) {
-                    const randomProduct = products[Math.floor(Math.random() * products.length)];
-                    const randomQuantity = Math.floor(Math.random() * 2) + 1;
-                    
-                    const existing = randomItems.find(item => item.id === randomProduct.id);
-                    if (existing) {
-                        existing.quantity += randomQuantity;
-                    } else {
-                        randomItems.push({ 
-                            id: randomProduct.id,
-                            name: randomProduct.name, 
-                            price: randomProduct.price, 
-                            quantity: randomQuantity,
-                            crownCost: randomProduct.crownCost || 0
-                        });
-                    }
+            setInterval(() => {
+                const items = [], names = ['Алексей', 'Мария', 'Дмитрий', 'Елена'];
+                for(let i=0; i<Math.floor(Math.random()*3)+1; i++) {
+                    const p = products[Math.floor(Math.random()*products.length)];
+                    const existing = items.find(x=>x.id===p.id);
+                    if(existing) existing.quantity++;
+                    else items.push({id:p.id, name:p.name, price:p.price, quantity:1, crownCost:p.crownCost||0});
                 }
-
-                const orderNum = Math.floor(1000 + Math.random() * 9000);
-                const subtotal = randomItems.reduce((acc, i) => acc + i.price * i.quantity, 0);
-                const delivery = randomType === 'delivery' ? 99 : 0;
-                const total = subtotal + delivery;
-                const crownEarned = Math.floor(total / 100);
-
-                const orderData = {
-                    userName: randomName,
-                    items: randomItems,
-                    subtotal: subtotal,
-                    delivery: delivery,
-                    total: total,
-                    crownsEarned: crownEarned,
-                    orderType: randomType,
-                    address: randomType === 'delivery' ? 'ул. Автоматическая, ' + Math.floor(Math.random() * 100) : null,
-                    status: 'waiting',
-                    createdAt: Date.now(),
-                    isAuto: true
-                };
-
-                db.ref('orders/' + orderNum).set(orderData);
-                showNotification(`🤖 Автозаказ #${orderNum}`);
+                const subtotal = items.reduce((s,i)=>s+i.price*i.quantity,0);
+                db.ref('orders/' + Math.floor(1000+Math.random()*9000)).set({
+                    userName: names[Math.floor(Math.random()*names.length)],
+                    items: items, subtotal, delivery:0, total:subtotal,
+                    crownsEarned: Math.floor(subtotal/100), orderType:'restaurant',
+                    status:'waiting', createdAt:Date.now(), isAuto:true
+                });
             }, 10000);
         }
 
+        function renderCategories() {
+            const cats = [{id:'all',name:'ВСЁ'},{id:'burger',name:'🍔 БУРГЕРЫ'},{id:'chicken',name:'🐔 ЧИКЕН'},{id:'snack',name:'🍟 СНЭКИ'},{id:'drink',name:'🥤 НАПИТКИ'},{id:'dessert',name:'🍰 ДЕСЕРТЫ'},{id:'combo',name:'📦 КОМБО'},{id:'crown',name:'👑 ЗА 1₽'}];
+            document.getElementById('categoryTabs').innerHTML = cats.map(c=>`<button class="cat-btn ${c.id===currentCategory?'active':''}" data-cat="${c.id}">${c.name}</button>`).join('');
+            document.querySelectorAll('.cat-btn').forEach(btn=>btn.addEventListener('click',function(){
+                document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+                this.classList.add('active'); currentCategory=this.dataset.cat; renderProducts();
+            }));
+        }
+
         function renderProducts() {
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = '';
-            
-            const filtered = currentCategory === 'all' 
-                ? products 
-                : products.filter(p => p.category === currentCategory);
-            
-            filtered.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                if (p.category === 'crown') {
-                    card.classList.add('crown');
-                }
-                
-                let priceHtml = `<div class="product-price">${p.price} ₽</div>`;
-                if (p.crownCost) {
-                    priceHtml = `<div class="product-price">${p.price} ₽ <span class="crown-cost"><i class="fas fa-crown"></i> ${p.crownCost}</span></div>`;
-                }
-                
-                card.innerHTML = `
+            const filtered = currentCategory==='all' ? products : products.filter(p=>p.category===currentCategory);
+            document.getElementById('productsGrid').innerHTML = filtered.map(p=>`
+                <div class="product-card ${p.crownCost?'crown':''}" onclick="addToOrder(${JSON.stringify(p).replace(/"/g, '&quot;')})">
                     <div class="product-name">${p.name}</div>
-                    ${priceHtml}
-                `;
-                
-                card.onclick = () => addToOrder(p);
-                
-                grid.appendChild(card);
-            });
+                    <div class="product-price">${p.price} ₽${p.crownCost?` <span class="crown-cost"><i class="fas fa-crown"></i> ${p.crownCost}</span>`:''}</div>
+                </div>
+            `).join('');
         }
 
-        function addToOrder(product) {
-            const existing = currentOrder.find(i => i.id === product.id);
-            if (existing) {
-                existing.quantity++;
-            } else {
-                currentOrder.push({ 
-                    ...product, 
-                    quantity: 1
-                });
-            }
+        window.addToOrder = (product) => {
+            const existing = currentOrder.find(i=>i.id===product.id);
+            if(existing) existing.quantity++;
+            else currentOrder.push({...product, quantity:1});
             updateOrderDisplay();
-        }
+        };
 
-        function removeOneFromOrder(id) {
-            const index = currentOrder.findIndex(i => i.id === id);
-            if (currentOrder[index].quantity > 1) {
-                currentOrder[index].quantity--;
-            } else {
-                currentOrder.splice(index, 1);
-            }
+        window.removeOneFromOrder = (id) => {
+            const idx = currentOrder.findIndex(i=>i.id===id);
+            if(currentOrder[idx].quantity>1) currentOrder[idx].quantity--;
+            else currentOrder.splice(idx,1);
             updateOrderDisplay();
-        }
+        };
 
-        function removeAllFromOrder(id) {
-            currentOrder = currentOrder.filter(i => i.id !== id);
+        window.removeAllFromOrder = (id) => {
+            currentOrder = currentOrder.filter(i=>i.id!==id);
             updateOrderDisplay();
-        }
+        };
 
         function updateOrderDisplay() {
             const container = document.getElementById('orderItems');
             const totalSpan = document.getElementById('totalAmount');
-            
-            if (currentOrder.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px;">Корзина пуста</div>';
-                totalSpan.innerText = '0 ₽';
-                return;
+            if(currentOrder.length===0){
+                container.innerHTML='<div style="text-align:center;padding:20px;">Корзина пуста</div>';
+                totalSpan.innerText='0 ₽'; return;
             }
-            
-            let html = '';
-            let total = 0;
-            currentOrder.forEach(item => {
-                total += item.price * item.quantity;
-                const crownText = item.crownCost ? `<span class="crown-icon"><i class="fas fa-crown"></i> ${item.crownCost * item.quantity}</span>` : '';
-                
-                html += `
-                    <div class="order-item">
-                        <div>
-                            <span>
-                                ${item.name} x${item.quantity}
-                                ${crownText}
-                            </span>
-                        </div>
-                        <div class="item-controls">
-                            <span>${item.price * item.quantity} ₽</span>
-                            <button class="item-btn minus" onclick="removeOneFromOrder(${item.id})">−</button>
-                            <button class="item-btn" onclick="removeAllFromOrder(${item.id})">✕</button>
-                        </div>
-                    </div>
-                `;
+            let total=0, html='';
+            currentOrder.forEach(item=>{
+                total+=item.price*item.quantity;
+                html+=`<div class="order-item"><div>${item.name} x${item.quantity}</div><div class="item-controls"><span>${item.price*item.quantity} ₽</span><button class="item-btn minus" onclick="removeOneFromOrder(${item.id})">−</button><button class="item-btn" onclick="removeAllFromOrder(${item.id})">✕</button></div></div>`;
             });
-            container.innerHTML = html;
-            totalSpan.innerText = total + ' ₽';
+            container.innerHTML=html;
+            totalSpan.innerText=total+' ₽';
         }
 
-        function clearOrder() {
-            currentOrder = [];
-            updateOrderDisplay();
-        }
+        function clearOrder() { currentOrder = []; updateOrderDisplay(); }
 
         window.showPaymentMethodSelector = () => {
-            if (currentOrder.length === 0) {
-                alert('Корзина пуста');
-                return;
-            }
-            document.getElementById('orderPhoneModal').style.display = 'flex';
-            document.getElementById('orderPhoneInput').value = '';
+            if(currentOrder.length===0){ alert('Корзина пуста'); return; }
+            document.getElementById('orderPhoneModal').style.display='flex';
+            document.getElementById('orderPhoneInput').value='';
         };
 
-        window.closeOrderPhoneModal = () => {
-            document.getElementById('orderPhoneModal').style.display = 'none';
-        };
+        window.closeOrderPhoneModal = () => document.getElementById('orderPhoneModal').style.display='none';
 
         window.confirmOrderWithPhone = () => {
-            const phone = document.getElementById('orderPhoneInput').value.trim();
-            if (!phone || phone.length < 10) {
-                alert('Введите номер телефона полностью');
-                return;
-            }
-            const fullPhone = '+7' + phone;
-            pendingOrderPhone = fullPhone;
-            document.getElementById('orderPhoneModal').style.display = 'none';
-            
-            const method = confirm('💰 Выберите способ оплаты:\n\n✅ "OK" - НАЛИЧНЫЕ\n❌ "Отмена" - КАРТА');
-            if (method) {
-                processOrderWithPhone('cash');
-            } else {
-                processOrderWithPhone('card');
-            }
+            let phone = document.getElementById('orderPhoneInput').value.trim().replace(/\D/g,'');
+            if(phone.length<10){ alert('Введите номер полностью'); return; }
+            pendingOrderPhone = '+7'+phone;
+            document.getElementById('orderPhoneModal').style.display='none';
+            document.getElementById('paymentAmount').innerText = currentOrder.reduce((s,i)=>s+i.price*i.quantity,0)+' ₽';
+            document.getElementById('paymentModal').style.display='flex';
         };
 
-        function processOrderWithPhone(method) {
+        window.confirmPayment = (success) => {
+            document.getElementById('paymentModal').style.display='none';
+            if(!success){ alert('❌ ОТКАЗ ОТ ОПЛАТЫ'); return; }
+            
+            const total = currentOrder.reduce((s,i)=>s+i.price*i.quantity,0);
             const orderNum = currentOrderNumber;
-            const total = currentOrder.reduce((acc, i) => acc + i.price * i.quantity, 0);
-            const crownEarned = Math.floor(total / 100);
             
             db.ref('users').orderByChild('phone').equalTo(pendingOrderPhone).once('value', (snapshot) => {
-                let userData = null;
                 let userId = null;
+                snapshot.forEach(c=>{ userId=c.key; });
                 
-                if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        userData = child.val();
-                        userId = child.key;
-                    });
+                if(!userId){
+                    userId = 'user_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
+                    db.ref('users/'+userId).set({id:userId, phone:pendingOrderPhone, name:'Клиент', crowns:0, createdAt:Date.now()});
                 }
                 
-                const orderData = {
-                    items: currentOrder.map(item => ({...item})),
-                    subtotal: total,
-                    delivery: 0,
-                    total: total,
-                    crownsEarned: crownEarned,
-                    orderType: 'restaurant',
-                    status: 'waiting',
-                    createdAt: Date.now(),
-                    paymentMethod: method,
-                    isCashierOrder: true,
-                    clientPhone: pendingOrderPhone,
-                    userName: userData ? (userData.name || 'Клиент') : 'Клиент',
-                    userId: userId || null
-                };
-                
-                const saveOrder = () => {
-                    db.ref('orders/' + orderNum).set(orderData).then(() => {
-                        alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН ${method === 'cash' ? 'НАЛИЧНЫМИ' : 'КАРТОЙ'}`);
-                        showNotification(`📱 Заказ #${orderNum} привязан к номеру ${pendingOrderPhone}`);
-                        currentOrder = [];
-                        currentOrderNumber = Math.floor(1000 + Math.random() * 9000);
-                        document.getElementById('orderNumber').innerText = currentOrderNumber;
-                        updateOrderDisplay();
-                        pendingOrderPhone = null;
-                    });
-                };
-                
-                if (!userData && pendingOrderPhone) {
-                    const newUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    const newUser = {
-                        id: newUserId,
-                        phone: pendingOrderPhone,
-                        name: 'Клиент',
-                        crowns: 0,
-                        addresses: []
-                    };
-                    
-                    orderData.userId = newUserId;
-                    db.ref('users/' + newUserId).set(newUser).then(saveOrder);
-                } else {
-                    saveOrder();
+                db.ref('orders/'+orderNum).set({
+                    items: currentOrder.map(i=>({id:i.id, name:i.name, price:i.price, quantity:i.quantity})),
+                    subtotal: total, total: total, crownsEarned: Math.floor(total/100),
+                    orderType: 'restaurant', status: 'waiting', createdAt: Date.now(),
+                    userId: userId, clientPhone: pendingOrderPhone, userName: 'Клиент', isCashierOrder: true
+                }).then(()=>{
+                    alert(`✅ ЗАКАЗ #${orderNum} ОПЛАЧЕН`);
+                    currentOrder = [];
+                    currentOrderNumber = Math.floor(1000+Math.random()*9000);
+                    document.getElementById('orderNumber').innerText = currentOrderNumber;
+                    updateOrderDisplay();
+                    pendingOrderPhone = null;
+                });
+            });
+        };
+
+        function setupFirebaseListener() {
+            db.ref('orders').on('child_added', (s) => {
+                const order = s.val();
+                if(order.status !== 'done' && order.orderType === 'restaurant'){
+                    orders[s.key] = order;
+                    updateIssueDisplay();
+                    showNotification('Новый заказ #'+s.key);
                 }
+            });
+            db.ref('orders').on('child_changed', (s) => {
+                const order = s.val();
+                if(order.status === 'done') delete orders[s.key];
+                else if(order.status === 'ready' && orders[s.key]) orders[s.key].status = 'ready';
+                else if(orders[s.key]) orders[s.key] = order;
+                updateIssueDisplay();
             });
         }
 
-        function showNotification(text) {
-            const notif = document.getElementById('notification');
-            notif.innerHTML = `🔔 ${text}`;
-            notif.style.display = 'block';
-            setTimeout(() => notif.style.display = 'none', 3000);
+        function updateIssueDisplay() {
+            const waitingDiv = document.getElementById('waitingOrders');
+            const readyDiv = document.getElementById('readyOrders');
+            let waiting='', ready='';
+            Object.entries(orders).forEach(([num,data])=>{
+                if(data.orderType !== 'restaurant') return;
+                const itemsList = data.items.map(i=>`${i.name} x${i.quantity}`).join(', ');
+                if(data.status === 'waiting'){
+                    waiting += `<div class="order-card"><div class="order-header"><span class="order-number">#${num}</span><span class="status-badge status-waiting">⏳ Готовится</span></div><div>${itemsList}</div><div>${data.total} ₽</div><button class="action-btn ready-btn" onclick="markAsReady('${num}')">✅ ГОТОВО</button></div>`;
+                } else if(data.status === 'ready'){
+                    ready += `<div class="order-card"><div class="order-header"><span class="order-number">#${num}</span><span class="status-badge status-ready">✅ Готов</span></div><div>${itemsList}</div><div>${data.total} ₽</div><button class="action-btn complete-btn" onclick="markAsDone('${num}')">🛒 ВЫДАН</button></div>`;
+                }
+            });
+            waitingDiv.innerHTML = waiting || '<p style="text-align:center;padding:20px;">Нет заказов</p>';
+            readyDiv.innerHTML = ready || '<p style="text-align:center;padding:20px;">Нет готовых заказов</p>';
         }
 
-        window.removeOneFromOrder = removeOneFromOrder;
-        window.removeAllFromOrder = removeAllFromOrder;
-
-        document.querySelectorAll('.cat-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentCategory = this.dataset.cat;
-                renderProducts();
-            });
-        });
+        window.markAsReady = (num) => {
+            if(orders[num]) db.ref('orders/'+num).update({status:'ready', readyAt:Date.now()});
+        };
+        window.markAsDone = (num) => {
+            if(orders[num]) db.ref('orders/'+num).update({status:'done', doneAt:Date.now()});
+        };
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+            event.target.classList.add('active');
+            if(tab==='cash'){ document.getElementById('cashTab').style.display='flex'; document.getElementById('issueTab').style.display='none'; }
+            else{ document.getElementById('cashTab').style.display='none'; document.getElementById('issueTab').style.display='flex'; updateIssueDisplay(); }
+        };
+        function showNotification(text){ const n=document.getElementById('notification'); n.innerHTML=`🔔 ${text}`; n.style.display='block'; setTimeout(()=>n.style.display='none',3000); }
+        window.clearOrder = clearOrder;
     </script>
 </body>
 </html>
